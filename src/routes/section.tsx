@@ -4,6 +4,7 @@ import DashboardLayout from "src/layouts/dashboard";
 
 export const IndexPage = lazy(() => import("src/pages/app"));
 export const LoginPage = lazy(() => import('src/pages/Login/Login'));
+export const SalesPage = lazy(() => import('src/pages/Sales/Sales'));
 export const Page404 = lazy(() => import('src/pages/Page-Not-Found/PageNotFound'));
 
 // ----------------------------------------------------------------------
@@ -18,7 +19,10 @@ export default function Router() {
           </Suspense>
         </DashboardLayout>
       ),
-      children: [{ element: <IndexPage />, index: true }],
+      children: [
+        { element: <IndexPage />, index: true },
+        { path: "sales", element: <SalesPage /> }
+      ],
     },
     {
       path: "login",
