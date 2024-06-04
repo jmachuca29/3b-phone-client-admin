@@ -1,6 +1,5 @@
 import { Avatar, Container, ListItemText, Stack, TableHead, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-// import Box from '@mui/material/Box';
 import { Box } from "@mui/material";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -16,14 +15,10 @@ import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
 import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
 import LastPageIcon from "@mui/icons-material/LastPage";
 import React, { useEffect, useState } from "react";
-// import useAppStore from 'src/store/store';
 import { useQuery } from "@tanstack/react-query";
-import InfoIcon from "@mui/icons-material/Info";
-import { useNavigate } from "react-router-dom";
 import { getSales } from "src/services/sales";
 import { faker } from '@faker-js/faker';
-import { OrderDetailBody, OrderDetailContainer, OrderDetailDate, OrderDetailDescription, OrderDetailStack, OrderDetailStatus } from "./styles";
-import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import { OrderDetailBody, OrderDetailContainer, OrderDetailDescription, OrderDetailStack } from "./styles";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
@@ -134,9 +129,7 @@ function TablePaginationActions(props: TablePaginationActionsProps) {
 const SalesPage = () => {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
-  // const [user] = useAppStore((state) => [state.user]);
   const [rows, setRows] = useState<any>([]);
-  const navigate = useNavigate();
 
   const { isPending, isError, error, data } = useQuery({
     queryKey: ["sales"], // Include the token as part of the query key
