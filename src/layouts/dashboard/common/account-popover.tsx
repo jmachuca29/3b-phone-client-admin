@@ -33,7 +33,7 @@ const MENU_OPTIONS = [
 export default function AccountPopover() {
   const [open, setOpen] = useState(null);
 
-  const handleOpen = (event) => {
+  const handleOpen = (event: any) => {
     setOpen(event.currentTarget);
   };
 
@@ -50,9 +50,9 @@ export default function AccountPopover() {
           height: 40,
           background: (theme) => alpha(theme.palette.grey[500], 0.08),
           ...(open && {
-            background: (theme) =>
+            background: (theme: any) =>
               `linear-gradient(135deg, ${theme.palette.primary.light} 0%, ${theme.palette.primary.main} 100%)`,
-          }),
+          }) as any,
         }}
       >
         <Avatar
