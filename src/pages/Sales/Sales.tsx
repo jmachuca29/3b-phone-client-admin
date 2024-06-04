@@ -1,4 +1,4 @@
-import { Container, Stack, TableHead, Typography } from "@mui/material";
+import { Avatar, Container, ListItemText, Stack, TableHead, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 // import Box from '@mui/material/Box';
 import { Box } from "@mui/material";
@@ -28,6 +28,8 @@ import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 import localizedFormat from "dayjs/plugin/localizedFormat";
+import Status from "src/components/status/status";
+import Iconify from "src/components/iconify";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -43,10 +45,20 @@ interface TablePaginationActionsProps {
   ) => void;
 }
 
-const calculateDate = (date: Date): string => {
+const calculateDate = (date: Date): any => {
   const time = dayjs(date);
-  const peruTime = time.tz("America/Lima").format("DD MMMM YYYY hh:mm A");
-  return peruTime;
+  const peruTimeDay = time.tz("America/Lima").format("DD MMMM YYYY");
+  const peruTimeHour = time.tz("America/Lima").format("hh:mm A");
+  return {
+    peruTimeDay,
+    peruTimeHour
+  };
+};
+
+const getRandomNumber = (): number => {
+  const max = 25
+  const min = 1
+  return Math.floor(Math.random() * (max - min + 1) + min);
 };
 
 function TablePaginationActions(props: TablePaginationActionsProps) {
@@ -129,6 +141,7 @@ const SalesPage = () => {
   const { isPending, isError, error, data } = useQuery({
     queryKey: ["sales"], // Include the token as part of the query key
     queryFn: getSales,
+    retry: false
   });
 
   useEffect(() => {
@@ -137,8 +150,6 @@ const SalesPage = () => {
       setRows(sales);
     }
   }, [data]);
-
-  console.log(rows);
 
   // Avoid a layout jump when reaching the last page with empty rows.
   const emptyRows =
@@ -170,17 +181,10 @@ const SalesPage = () => {
     <Container maxWidth="lg">
       <OrderDetailContainer>
         <OrderDetailStack>
-          <IconButton aria-label="arrow-back" onClick={() => navigate(-1)}>
-            <ChevronLeftIcon />
-          </IconButton>
           <OrderDetailBody>
             <OrderDetailDescription>
-              <Typography variant="h4">Sales #</Typography>
-              <OrderDetailStatus>STATUS</OrderDetailStatus>
+              <Typography variant="h4">My Sales</Typography>
             </OrderDetailDescription>
-            <OrderDetailDate variant="body2">
-              {calculateDate(new Date())}
-            </OrderDetailDate>
           </OrderDetailBody>
         </OrderDetailStack>
       </OrderDetailContainer>
@@ -190,35 +194,47 @@ const SalesPage = () => {
             <TableHead>
               <TableRow>
                 <TableCell># Orden</TableCell>
-                <TableCell align="right">Precio</TableCell>
-                <TableCell align="right">Status</TableCell>
+                <TableCell align="left">Cliente</TableCell>
+                <TableCell align="left">Fecha</TableCell>
+                <TableCell align="left">Precio</TableCell>
+                <TableCell align="left">Status</TableCell>
                 <TableCell align="right"></TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {(rowsPerPage > 0
                 ? rows.slice(
-                    page * rowsPerPage,
-                    page * rowsPerPage + rowsPerPage
-                  )
+                  page * rowsPerPage,
+                  page * rowsPerPage + rowsPerPage
+                )
                 : rows
               ).map((row: any) => (
                 <TableRow key={row.uuid || faker.string.uuid()}>
                   <TableCell component="th" scope="row">
                     {row.uuid || 'Not available'}
                   </TableCell>
-                  <TableCell style={{ width: 160 }} align="right">
+                  <TableCell style={{ display: 'flex', alignItems: 'center' }} align="left">
+                    <Avatar sx={{ marginRight: 2 }} src={`/assets/images/avatars/avatar_${getRandomNumber()}.jpg`} alt="photoURL" />
+                    <ListItemText
+                      primary={row?.user?.name + ' ' + row?.user?.last_name || 'Usuario Anonimo'}
+                      secondary={row?.user?.email || null}
+                    />
+                  </TableCell>
+                  <TableCell style={{ width: 160 }} align="left">
+                    <ListItemText
+                      primary={row?.createdAt ? calculateDate(row?.createdAt).peruTimeDay : '-'}
+                      secondary={row?.createdAt ? calculateDate(row?.createdAt).peruTimeHour : null}
+                    />
+                  </TableCell>
+                  <TableCell style={{ width: 160 }} align="left">
                     {row.price}
                   </TableCell>
-                  <TableCell style={{ width: 160 }} align="right">
-                    {row.status}
+                  <TableCell style={{ width: 160 }} align="left">
+                    <Status state={row.status} />
                   </TableCell>
-                  <TableCell style={{ width: 160 }} align="right">
-                    <IconButton
-                      aria-label="info-icon"
-                      onClick={() => navigate(`/resume/${row.uuid}`)}
-                    >
-                      <InfoIcon />
+                  <TableCell align="right">
+                    <IconButton>
+                      <Iconify icon="bi:three-dots-vertical" />
                     </IconButton>
                   </TableCell>
                 </TableRow>
