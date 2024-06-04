@@ -1,8 +1,8 @@
 import { useMemo } from 'react';
 import PropTypes from 'prop-types';
 
-import CssBaseline from '@mui/material/CssBaseline';
 import { createTheme, ThemeProvider as MUIThemeProvider } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
 
 import { palette } from './palette';
 import { shadows } from './shadows';
