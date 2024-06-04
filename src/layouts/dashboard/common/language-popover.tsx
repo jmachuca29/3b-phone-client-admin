@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import Box from '@mui/material/Box';
+import { Box } from '@mui/material';
 import Popover from '@mui/material/Popover';
 import MenuItem from '@mui/material/MenuItem';
 import IconButton from '@mui/material/IconButton';
@@ -30,7 +30,7 @@ const LANGS = [
 export default function LanguagePopover() {
   const [open, setOpen] = useState(null);
 
-  const handleOpen = (event) => {
+  const handleOpen = (event: any) => {
     setOpen(event.currentTarget);
   };
 
@@ -47,7 +47,7 @@ export default function LanguagePopover() {
           height: 40,
           ...(open && {
             bgcolor: 'action.selected',
-          }),
+          }) as any,
         }}
       >
         <img src={LANGS[0].icon} alt={LANGS[0].label} />

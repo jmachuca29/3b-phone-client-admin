@@ -1,6 +1,6 @@
-import { useScrollToTop } from './hooks/use-scroll-to-top';
-import Router from 'src/routes/section';
-import ThemeProvider from 'src/theme';
+import { useScrollToTop } from "./hooks/use-scroll-to-top";
+import Router from "src/routes/section";
+import ThemeProvider from "src/theme";
 
 function App() {
   useScrollToTop();
@@ -12,4 +12,4 @@ function App() {
   );
 }
 
-export default App
+export default App;
