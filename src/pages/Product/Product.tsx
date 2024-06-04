@@ -1,4 +1,4 @@
-import { Container, Stack, TableHead, Typography } from "@mui/material";
+import { Container, Stack, TableHead } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 // import Box from '@mui/material/Box';
 import { Box } from "@mui/material";
@@ -16,22 +16,10 @@ import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
 import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
 import LastPageIcon from "@mui/icons-material/LastPage";
 import React, { useEffect, useState } from "react";
-// import useAppStore from 'src/store/store';
 import { useQuery } from "@tanstack/react-query";
 import InfoIcon from "@mui/icons-material/Info";
 import { useNavigate } from "react-router-dom";
-import { getSales } from "src/services/sales";
-import { faker } from '@faker-js/faker';
-import { OrderDetailBody, OrderDetailContainer, OrderDetailDate, OrderDetailDescription, OrderDetailStack, OrderDetailStatus } from "./styles";
-import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc";
-import timezone from "dayjs/plugin/timezone";
-import localizedFormat from "dayjs/plugin/localizedFormat";
-
-dayjs.extend(utc);
-dayjs.extend(timezone);
-dayjs.extend(localizedFormat);
+import { getProducts } from "src/services/product";
 
 interface TablePaginationActionsProps {
   count: number;
@@ -42,12 +30,6 @@ interface TablePaginationActionsProps {
     newPage: number
   ) => void;
 }
-
-const calculateDate = (date: Date): string => {
-  const time = dayjs(date);
-  const peruTime = time.tz("America/Lima").format("DD MMMM YYYY hh:mm A");
-  return peruTime;
-};
 
 function TablePaginationActions(props: TablePaginationActionsProps) {
   const theme = useTheme();
@@ -119,7 +101,7 @@ function TablePaginationActions(props: TablePaginationActionsProps) {
   );
 }
 
-const SalesPage = () => {
+const ProductPage = () => {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   // const [user] = useAppStore((state) => [state.user]);
@@ -127,8 +109,8 @@ const SalesPage = () => {
   const navigate = useNavigate();
 
   const { isPending, isError, error, data } = useQuery({
-    queryKey: ["sales"], // Include the token as part of the query key
-    queryFn: getSales,
+    queryKey: ["products"], // Include the token as part of the query key
+    queryFn: getProducts,
   });
 
   useEffect(() => {
@@ -168,30 +150,15 @@ const SalesPage = () => {
 
   return (
     <Container maxWidth="lg">
-      <OrderDetailContainer>
-        <OrderDetailStack>
-          <IconButton aria-label="arrow-back" onClick={() => navigate(-1)}>
-            <ChevronLeftIcon />
-          </IconButton>
-          <OrderDetailBody>
-            <OrderDetailDescription>
-              <Typography variant="h4">Sales #</Typography>
-              <OrderDetailStatus>STATUS</OrderDetailStatus>
-            </OrderDetailDescription>
-            <OrderDetailDate variant="body2">
-              {calculateDate(new Date())}
-            </OrderDetailDate>
-          </OrderDetailBody>
-        </OrderDetailStack>
-      </OrderDetailContainer>
+      <div>My Products</div>
       <Stack>
         <TableContainer component={Paper}>
           <Table sx={{ minWidth: 500 }} aria-label="custom pagination table">
             <TableHead>
               <TableRow>
-                <TableCell># Orden</TableCell>
-                <TableCell align="right">Precio</TableCell>
-                <TableCell align="right">Status</TableCell>
+                <TableCell>Descripcion</TableCell>
+                <TableCell align="right">Capacidad</TableCell>
+                <TableCell align="right">Color</TableCell>
                 <TableCell align="right"></TableCell>
               </TableRow>
             </TableHead>
@@ -203,15 +170,15 @@ const SalesPage = () => {
                   )
                 : rows
               ).map((row: any) => (
-                <TableRow key={row.uuid || faker.string.uuid()}>
+                <TableRow key={row._id}>
                   <TableCell component="th" scope="row">
-                    {row.uuid || 'Not available'}
+                    {row.description}
                   </TableCell>
                   <TableCell style={{ width: 160 }} align="right">
-                    {row.price}
+                    {row?.capacity?.description}
                   </TableCell>
                   <TableCell style={{ width: 160 }} align="right">
-                    {row.status}
+                    {row?.color?.description}
                   </TableCell>
                   <TableCell style={{ width: 160 }} align="right">
                     <IconButton
@@ -258,4 +225,4 @@ const SalesPage = () => {
   );
 };
 
-export default SalesPage;
+export default ProductPage;
