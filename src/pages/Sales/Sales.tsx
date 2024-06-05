@@ -57,12 +57,6 @@ const calculateDate = (date: Date): any => {
   };
 };
 
-const getRandomNumber = (): number => {
-  const max = 25
-  const min = 1
-  return Math.floor(Math.random() * (max - min + 1) + min);
-};
-
 function TablePaginationActions(props: TablePaginationActionsProps) {
   const theme = useTheme();
   const { count, page, rowsPerPage, onPageChange } = props;
