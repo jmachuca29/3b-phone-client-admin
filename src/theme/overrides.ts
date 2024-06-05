@@ -69,6 +69,10 @@ export function overrides(theme: any): any {
             backgroundColor: theme.palette.primary.dark,
           },
         },
+        outlined: {
+          padding: theme.spacing(0.625, 1.5),
+          textTransform: 'capitalize'
+        },
         sizeLarge: {
           minHeight: 48,
         },

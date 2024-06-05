@@ -1,4 +1,4 @@
-import { Avatar, Container, ListItemText, Stack, TableHead, Typography } from "@mui/material";
+import { Avatar, Container, ListItemText, Menu, MenuItem, Stack, TableHead, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { Box } from "@mui/material";
 import Table from "@mui/material/Table";
@@ -25,6 +25,7 @@ import timezone from "dayjs/plugin/timezone";
 import localizedFormat from "dayjs/plugin/localizedFormat";
 import Status from "src/components/status/status";
 import Iconify from "src/components/iconify";
+import { useNavigate } from "react-router-dom";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -39,6 +40,12 @@ interface TablePaginationActionsProps {
     newPage: number
   ) => void;
 }
+
+const stringAvatar = (name: string) => {
+  return {
+    children: `${name.split(" ")[0][0]}${name.split(" ")[1][0]}`,
+  };
+};
 
 const calculateDate = (date: Date): any => {
   const time = dayjs(date);
@@ -127,9 +134,19 @@ function TablePaginationActions(props: TablePaginationActionsProps) {
 }
 
 const SalesPage = () => {
+  const navigate = useNavigate();
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [rows, setRows] = useState<any>([]);
+  const [menuAnchorEls, setMenuAnchorEls] = useState<{ [key: number]: HTMLElement | null }>({});
+
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>, index: number) => {
+    setMenuAnchorEls((prev) => ({ ...prev, [index]: event.currentTarget }));
+  };
+
+  const handleClose = (index: number) => {
+    setMenuAnchorEls((prev) => ({ ...prev, [index]: null }));
+  };
 
   const { isPending, isError, error, data } = useQuery({
     queryKey: ["sales"], // Include the token as part of the query key
@@ -201,13 +218,19 @@ const SalesPage = () => {
                   page * rowsPerPage + rowsPerPage
                 )
                 : rows
-              ).map((row: any) => (
+              ).map((row: any, index: number) => (
                 <TableRow key={row.uuid || faker.string.uuid()}>
                   <TableCell component="th" scope="row">
                     {row.uuid || 'Not available'}
                   </TableCell>
                   <TableCell style={{ display: 'flex', alignItems: 'center' }} align="left">
-                    <Avatar sx={{ marginRight: 2 }} src={`/assets/images/avatars/avatar_${getRandomNumber()}.jpg`} alt="photoURL" />
+                    <Avatar sx={{ marginRight: 2 }} {...stringAvatar(
+                      `${row?.user?.name.toUpperCase() +
+                      " " +
+                      row?.user?.last_name.toUpperCase()
+                      }`
+                    )}>
+                    </Avatar>
                     <ListItemText
                       primary={row?.user?.name + ' ' + row?.user?.last_name || 'Usuario Anonimo'}
                       secondary={row?.user?.email || null}
@@ -226,9 +249,22 @@ const SalesPage = () => {
                     <Status state={row.status} />
                   </TableCell>
                   <TableCell align="right">
-                    <IconButton>
+                    <IconButton onClick={(event) => handleClick(event, index)}>
                       <Iconify icon="bi:three-dots-vertical" />
                     </IconButton>
+                    <Menu
+                      anchorEl={menuAnchorEls[index]}
+                      open={Boolean(menuAnchorEls[index])}
+                      onClose={() => handleClose(index)}
+                      MenuListProps={{
+                        'aria-labelledby': 'basic-button',
+                      }}
+                    >
+                      <MenuItem onClick={() => navigate(`detail/${row.uuid}`)}>
+                        <Iconify style={{ marginRight: 8 }} icon="carbon:view-filled" />
+                        Ver
+                      </MenuItem>
+                    </Menu>
                   </TableCell>
                 </TableRow>
               ))}
