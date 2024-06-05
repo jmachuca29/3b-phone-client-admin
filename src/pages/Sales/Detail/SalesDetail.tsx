@@ -144,7 +144,7 @@ const SalesDetail = () => {
                     </IconButton>
                     <OrderDetailBody>
                         <OrderDetailDescription>
-                            <Typography variant="h4">Orden #{uuid}</Typography>
+                            <Typography variant="h4">Sales #{uuid}</Typography>
                             <Status state={product?.status} />
                         </OrderDetailDescription>
                         <OrderDetailDate variant="body2">
@@ -159,7 +159,7 @@ const SalesDetail = () => {
                         onClick={handleClick}>
                         {product?.status.toLowerCase()}
                     </Button>
-                    <Button variant="contained">Edit</Button>
+                    <Button variant="contained" onClick={() => navigate(`../edit/${product?.uuid}`)}>Edit</Button>
                     <Menu
                         id="basic-menu"
                         anchorEl={anchorEl}

@@ -258,6 +258,10 @@ const SalesPage = () => {
                         <Iconify style={{ marginRight: 8 }} icon="carbon:view-filled" />
                         Ver
                       </MenuItem>
+                      <MenuItem onClick={() => navigate(`edit/${row.uuid}`)}>
+                        <Iconify style={{ marginRight: 8 }} icon="fluent:edit-24-filled" />
+                        Editar
+                      </MenuItem>
                     </Menu>
                   </TableCell>
                 </TableRow>
