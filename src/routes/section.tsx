@@ -6,6 +6,7 @@ export const IndexPage = lazy(() => import("src/pages/app"));
 export const LoginPage = lazy(() => import('src/pages/Login/Login'));
 export const SalesPage = lazy(() => import('src/pages/Sales/Sales'));
 export const SalesDetailPage = lazy(() => import('src/pages/Sales/Detail/SalesDetail'));
+export const SalesEditPage = lazy(() => import('src/pages/Sales/Edit/SalesEdit'));
 export const ProductPage = lazy(() => import('src/pages/Product/Product'));
 export const ProductDetailPage = lazy(() => import('src/pages/Product/Detail/ProductDetail'));
 export const Page404 = lazy(() => import('src/pages/Page-Not-Found/PageNotFound'));
@@ -29,7 +30,8 @@ export default function Router() {
           element: (<Outlet />),
           children: [
             { element: <SalesPage />, index: true },
-            { path: "detail/:uuid", element: <SalesDetailPage /> }
+            { path: "detail/:uuid", element: <SalesDetailPage /> },
+            { path: "edit/:uuid", element: <SalesEditPage /> }
           ]
         },
         {
