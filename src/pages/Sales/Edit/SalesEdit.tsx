@@ -92,7 +92,7 @@ const SalesEdit = () => {
 
     const mutationSale = useMutation({
         mutationFn: ({ id, sale }: any) => updateSale(id, sale),
-        onSuccess:  ($event) => {
+        onSuccess:  () => {
           navigate(-1)
         },
         onError: (error: any) => {
