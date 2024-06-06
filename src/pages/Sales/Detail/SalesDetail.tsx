@@ -194,7 +194,7 @@ const SalesDetail = () => {
                                     </ProductDetailDescriptionAvatar>
                                     <ProductDetailDescriptionListItem>
                                         <ListItemText
-                                            primary={product?.product?.description}
+                                            primary={product?.productName}
                                             secondary={product?.capacity?.description}
                                         />
                                     </ProductDetailDescriptionListItem>
@@ -248,13 +248,13 @@ const SalesDetail = () => {
                                 {...stringAvatar(
                                     `${product?.user?.name.toUpperCase() +
                                     " " +
-                                    product?.user?.last_name.toUpperCase()
+                                    product?.user?.lastName.toUpperCase()
                                     }`
                                 )}
                             ></CustomerInfoAvatarContainer>
                             <CustomerInfoDescriptionContainer>
                                 <Typography variant="subtitle2" gutterBottom>
-                                    {product?.user?.name} {product?.user?.last_name}
+                                    {product?.user?.name} {product?.user?.lastName}
                                 </Typography>
                                 <Box>{product?.user?.email}</Box>
                             </CustomerInfoDescriptionContainer>
@@ -302,7 +302,7 @@ const SalesDetail = () => {
                                 <CustomerShippingSubCategoryName>
                                     Phone number
                                 </CustomerShippingSubCategoryName>
-                                {product?.user?.cellphone}
+                                {product?.user?.phoneNumber}
                             </CustomerShippingSubCategoryContainer>
                         </CustomerShippingContainer>
                         <Divider />

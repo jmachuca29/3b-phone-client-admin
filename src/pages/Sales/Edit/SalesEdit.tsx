@@ -25,15 +25,15 @@ type Inputs = {
     name: string,
     lastName: string,
     email: string,
-    cellphone: string,
+    phoneNumber: string,
     address: string,
     paymentType: string,
     bankEntity: string,
     numberAccount: string,
     productDescription: string,
     serieNumber: string,
-    imei_1: string,
-    imei_2: string,
+    firstImei: string,
+    secondImei: string,
     capacity: string,
     grade: string,
     accesories: string[],
@@ -44,15 +44,15 @@ const defaultFormValue: Inputs = {
     name: '',
     lastName: '',
     email: '',
-    cellphone: '',
+    phoneNumber: '',
     address: '',
     paymentType: '',
     bankEntity: '',
     numberAccount: '',
     productDescription: '',
     serieNumber: '',
-    imei_1: '',
-    imei_2: '',
+    firstImei: '',
+    secondImei: '',
     capacity: '',
     grade: '',
     accesories: [],
@@ -117,17 +117,17 @@ const SalesEdit = () => {
 
     const setForm = (data: any) => {
         setValue('name', data?.user?.name)
-        setValue('lastName', data?.user?.last_name)
+        setValue('lastName', data?.user?.lastName)
         setValue('email', data?.user?.email)
-        setValue('cellphone', data?.user?.cellphone)
+        setValue('phoneNumber', data?.user?.phoneNumber)
         setValue('address', data?.user?.address)
         setValue('paymentType', data?.paymentType)
         setValue('bankEntity', data?.bankEntity)
         setValue('numberAccount', data?.numberAccount)
-        setValue('productDescription', data?.product?.description)
+        setValue('productDescription', data?.productName)
         setValue('serieNumber', data?.serieNumber)
-        setValue('imei_1', data?.imei_1)
-        setValue('imei_2', data?.imei_2)
+        setValue('firstImei', data?.firstImei)
+        setValue('secondImei', data?.secondImei)
         setValue('capacity', data?.capacity?._id)
         setValue('grade', data?.grade)
         setValue('accesories', data?.accesories)
@@ -183,7 +183,7 @@ const SalesEdit = () => {
                                         render={({ field }) => <TextField label="Email" variant="outlined" {...field} />}
                                     />
                                     <Controller
-                                        name="cellphone"
+                                        name="phoneNumber"
                                         control={control}
                                         render={({ field }) => <TextField label="Numero Telefonico" variant="outlined" {...field} />}
                                     />
@@ -258,12 +258,12 @@ const SalesEdit = () => {
                                 />
                                 <Box sx={{ display: 'grid', gap: '24px 16px', gridTemplateColumns: 'repeat(2, 1fr)' }}>
                                     <Controller
-                                        name="imei_1"
+                                        name="firstImei"
                                         control={control}
                                         render={({ field }) => <TextField label="Imei 1" variant="outlined" {...field} />}
                                     />
                                     <Controller
-                                        name="imei_2"
+                                        name="secondImei"
                                         control={control}
                                         render={({ field }) => <TextField label="Imei 2" variant="outlined" {...field} />}
                                     />

@@ -221,12 +221,12 @@ const SalesPage = () => {
                     <Avatar sx={{ marginRight: 2 }} {...stringAvatar(
                       `${row?.user?.name.toUpperCase() +
                       " " +
-                      row?.user?.last_name.toUpperCase()
+                      row?.user?.lastName.toUpperCase()
                       }`
                     )}>
                     </Avatar>
                     <ListItemText
-                      primary={row?.user?.name + ' ' + row?.user?.last_name || 'Usuario Anonimo'}
+                      primary={row?.user?.name + ' ' + row?.user?.lastName || 'Usuario Anonimo'}
                       secondary={row?.user?.email || null}
                     />
                   </TableCell>
