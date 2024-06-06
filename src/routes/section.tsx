@@ -5,6 +5,7 @@ import DashboardLayout from "src/layouts/dashboard";
 export const IndexPage = lazy(() => import("src/pages/app"));
 export const LoginPage = lazy(() => import('src/pages/Login/Login'));
 export const SalesPage = lazy(() => import('src/pages/Sales/Sales'));
+export const SalesCreatePage = lazy(() => import('src/pages/Sales/Create/SalesCreate'));
 export const SalesDetailPage = lazy(() => import('src/pages/Sales/Detail/SalesDetail'));
 export const SalesEditPage = lazy(() => import('src/pages/Sales/Edit/SalesEdit'));
 export const ProductPage = lazy(() => import('src/pages/Product/Product'));
@@ -30,6 +31,7 @@ export default function Router() {
           element: (<Outlet />),
           children: [
             { element: <SalesPage />, index: true },
+            { path: "create", element: <SalesCreatePage /> },
             { path: "detail/:uuid", element: <SalesDetailPage /> },
             { path: "edit/:uuid", element: <SalesEditPage /> }
           ]

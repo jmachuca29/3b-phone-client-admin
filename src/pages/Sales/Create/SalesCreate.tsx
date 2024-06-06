@@ -1,14 +1,14 @@
 import { Box, Button, Checkbox, Container, FormControl, IconButton, InputLabel, ListItemText, Menu, MenuItem, OutlinedInput, Paper, Select, SelectChangeEvent, Stack, TextField, Typography } from '@mui/material'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { OrderDetailActions, OrderDetailBody, OrderDetailContainer, OrderDetailDate, OrderDetailDescription, OrderDetailStack } from './styles'
 import Status from 'src/components/status/status'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 import localizedFormat from "dayjs/plugin/localizedFormat";
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { getSalebyUID, updateSale } from 'src/services/sales'
+import { createSale } from 'src/services/sales'
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import Grid from '@mui/material/Unstable_Grid2';
 import { getPaymentType } from 'src/services/payment-type'
@@ -16,7 +16,7 @@ import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { getCapacity } from 'src/services/capacity'
 import { getGrade } from 'src/services/grade'
 import { getAccesories } from 'src/services/accesories'
-import { SaleUpdateProps, SalesUpdateDto } from 'src/models/sales'
+import { SaleCreateProps, SalesCreateDto } from 'src/models/sales'
 import Iconify from 'src/components/iconify'
 import { SaleState } from 'src/constant/sales'
 
@@ -35,7 +35,6 @@ type Inputs = {
     paymentType: string,
     bankEntity: string,
     numberAccount: string,
-    productId: string,
     productName: string,
     serieNumber: string,
     firstImei: string,
@@ -44,7 +43,6 @@ type Inputs = {
     grade: string,
     accesories: string[],
     price: string,
-    uuid: string,
     status: SaleState
 };
 
@@ -57,7 +55,6 @@ const defaultFormValue: Inputs = {
     paymentType: '',
     bankEntity: '',
     numberAccount: '',
-    productId: '',
     productName: '',
     serieNumber: '',
     firstImei: '',
@@ -66,7 +63,6 @@ const defaultFormValue: Inputs = {
     grade: '',
     accesories: [],
     price: '',
-    uuid: '',
     status: SaleState.Pending
 };
 
@@ -76,10 +72,9 @@ const calculateDate = (date: Date): string => {
     return peruTime;
 };
 
-const SalesEdit = () => {
-    const { uuid } = useParams();
+const SalesCreate = () => {
     const navigate = useNavigate();
-    const [product, setProduct] = useState<any>(null);
+    const [product, setProduct] = useState<any>(defaultFormValue);
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
 
@@ -91,20 +86,15 @@ const SalesEdit = () => {
     };
 
     const mutationSale = useMutation({
-        mutationFn: ({ id, sale }: any) => updateSale(id, sale),
-        onSuccess:  () => {
+        mutationFn: createSale,
+        onSuccess:  ($event) => {
+          console.log($event)
           navigate(-1)
         },
         onError: (error: any) => {
             console.log(error)
         },
       });
-
-    const { data } = useQuery({
-        queryKey: ["saleDetail", uuid],
-        queryFn: () =>
-            uuid ? getSalebyUID(uuid) : Promise.reject("No uuid found"),
-    });
 
     const { data: paymentTypeData } = useQuery({
         queryKey: ["paymentType"],
@@ -129,36 +119,6 @@ const SalesEdit = () => {
         defaultValues: defaultFormValue,
     });
 
-    useEffect(() => {
-        if (data) {
-            const response = data?.data || null;
-            setForm(response);
-            setProduct(response);
-        }
-    }, [data]);
-
-    const setForm = (data: any) => {
-        setValue('name', data?.user?.name)
-        setValue('lastName', data?.user?.lastName)
-        setValue('email', data?.user?.email)
-        setValue('phoneNumber', data?.user?.phoneNumber)
-        setValue('address', data?.user?.address)
-        setValue('paymentType', data?.paymentType)
-        setValue('bankEntity', data?.bankEntity)
-        setValue('numberAccount', data?.numberAccount)
-        setValue('productId', data?.productId)
-        setValue('productName', data?.productName)
-        setValue('serieNumber', data?.serieNumber)
-        setValue('firstImei', data?.firstImei)
-        setValue('secondImei', data?.secondImei)
-        setValue('capacity', data?.capacity?._id)
-        setValue('grade', data?.grade)
-        setValue('accesories', data?.accesories)
-        setValue('price', data?.price)
-        setValue('uuid', data?.uuid)
-        setValue('status', data?.status)
-    }
-
     const updateState = (state: SaleState) => {
         setValue('status', state)
         setProduct((prevProduct: any) => ({
@@ -169,8 +129,7 @@ const SalesEdit = () => {
     }
 
     const onSubmit: SubmitHandler<Inputs> = (data) => {
-        const saleSchema: SaleUpdateProps = {
-            productId: data?.productId,
+        const saleSchema: SaleCreateProps = {
             productName: data?.productName,
             capacity: data?.capacity,
             accesories: data?.accesories,
@@ -188,13 +147,12 @@ const SalesEdit = () => {
                 address: data?.address
             },
             price: Number(data?.price),
-            uuid: data?.uuid,
             bankEntity: data?.bankEntity,
             numberAccount: data?.numberAccount,
             status: data?.status
         }
-        const sales = new SalesUpdateDto(saleSchema)
-        mutationSale.mutate({ id: product._id, sale: sales })
+        const sale = new SalesCreateDto(saleSchema)
+        mutationSale.mutate(sale)
     }
 
 
@@ -207,7 +165,7 @@ const SalesEdit = () => {
                     </IconButton>
                     <OrderDetailBody>
                         <OrderDetailDescription>
-                            <Typography variant="h4">Orden #{uuid}</Typography>
+                            <Typography variant="h4">Nueva Orden</Typography>
                             <Status state={product?.status} />
                         </OrderDetailDescription>
                         <OrderDetailDate variant="body2">
@@ -220,7 +178,7 @@ const SalesEdit = () => {
                         variant="outlined"
                         endIcon={<Iconify icon="iconamoon:arrow-down-2" />}
                         onClick={handleClick}>
-                        {product?.status.toLowerCase()}
+                        {product?.status}
                     </Button>
                     <Menu
                         id="basic-menu"
@@ -438,7 +396,7 @@ const SalesEdit = () => {
                     </Grid>
                     <Grid xs={4}></Grid>
                     <Grid xs={8} sx={{ textAlign: 'end' }}>
-                        <Button type='submit' variant="contained" size='large'>Guardar Cambios</Button>
+                        <Button type='submit' variant="contained" size='large'>Crear</Button>
                     </Grid>
                 </Grid>
             </form>
@@ -446,4 +404,4 @@ const SalesEdit = () => {
     )
 }
 
-export default SalesEdit
+export default SalesCreate

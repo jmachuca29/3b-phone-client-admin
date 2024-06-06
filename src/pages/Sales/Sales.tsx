@@ -1,4 +1,4 @@
-import { Avatar, Container, ListItemText, Menu, MenuItem, Stack, TableHead, Typography } from "@mui/material";
+import { Avatar, Button, Container, ListItemText, Menu, MenuItem, Stack, TableHead, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { Box } from "@mui/material";
 import Table from "@mui/material/Table";
@@ -18,7 +18,7 @@ import React, { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getSales } from "src/services/sales";
 import { faker } from '@faker-js/faker';
-import { OrderDetailBody, OrderDetailContainer, OrderDetailDescription, OrderDetailStack } from "./styles";
+import { OrderDetailActions, OrderDetailBody, OrderDetailContainer, OrderDetailDescription, OrderDetailStack } from "./styles";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
@@ -191,6 +191,9 @@ const SalesPage = () => {
             </OrderDetailDescription>
           </OrderDetailBody>
         </OrderDetailStack>
+        <OrderDetailActions>
+          <Button variant="contained" onClick={() => navigate('create')}>Nueva Orden</Button>
+        </OrderDetailActions>
       </OrderDetailContainer>
       <Stack>
         <TableContainer component={Paper}>
@@ -221,12 +224,12 @@ const SalesPage = () => {
                     <Avatar sx={{ marginRight: 2 }} {...stringAvatar(
                       `${row?.user?.name.toUpperCase() +
                       " " +
-                      row?.user?.last_name.toUpperCase()
+                      row?.user?.lastName.toUpperCase()
                       }`
                     )}>
                     </Avatar>
                     <ListItemText
-                      primary={row?.user?.name + ' ' + row?.user?.last_name || 'Usuario Anonimo'}
+                      primary={row?.user?.name + ' ' + row?.user?.lastName || 'Usuario Anonimo'}
                       secondary={row?.user?.email || null}
                     />
                   </TableCell>

@@ -1,12 +1,6 @@
 import styled from "@emotion/styled";
 import { Box } from "@mui/material";
-
-export enum SaleState {
-    Pending = 'PENDING',
-    Approved = 'APPROVED',
-    Rejected = 'REJECTED',
-    Reajusted = 'REAJUSTED'
-}
+import { SaleState } from "src/constant/sales";
 
 type ECStatusProps = {
     state: SaleState
