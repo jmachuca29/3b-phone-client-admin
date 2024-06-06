@@ -1,12 +1,6 @@
 import React from 'react'
 import ECStatus from './styles'
-
-export enum SaleState {
-    Pending = 'PENDING',
-    Approved = 'APPROVED',
-    Rejected = 'REJECTED',
-    Reajusted = 'REAJUSTED'
-}
+import { SaleState } from 'src/constant/sales'
 
 interface IStatus {
     state: SaleState

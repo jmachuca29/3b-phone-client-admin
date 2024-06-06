@@ -227,11 +227,11 @@ export {
   //ORDER DETAIL
   OrderDetailContainer,
   OrderDetailStack,
-  OrderDetailActions,
   OrderDetailBody,
   OrderDetailDescription,
   OrderDetailDate,
   OrderDetailStatus,
+  OrderDetailActions,
   //PRODUCT CARD
   ProductDetailContainer,
   ProductDetailDescriptionContainer,

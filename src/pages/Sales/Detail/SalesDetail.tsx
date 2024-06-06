@@ -58,17 +58,11 @@ import timezone from "dayjs/plugin/timezone";
 import localizedFormat from "dayjs/plugin/localizedFormat";
 import Iconify from "src/components/iconify";
 import Status from "src/components/status/status";
+import { SaleState } from "src/constant/sales";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
 dayjs.extend(localizedFormat);
-
-enum SaleState {
-    Pending = 'PENDING',
-    Approved = 'APPROVED',
-    Rejected = 'REJECTED',
-    Reajusted = 'REAJUSTED'
-}
 
 const SaleStateEnum: SaleState[] = [SaleState.Pending, SaleState.Approved, SaleState.Rejected, SaleState.Reajusted]
 
