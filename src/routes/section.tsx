@@ -9,6 +9,7 @@ export const SalesCreatePage = lazy(() => import('src/pages/Sales/Create/SalesCr
 export const SalesDetailPage = lazy(() => import('src/pages/Sales/Detail/SalesDetail'));
 export const SalesEditPage = lazy(() => import('src/pages/Sales/Edit/SalesEdit'));
 export const ProductPage = lazy(() => import('src/pages/Product/Product'));
+export const ProductCreatePage = lazy(() => import('src/pages/Product/Create/ProductCreate'));
 export const ProductDetailPage = lazy(() => import('src/pages/Product/Detail/ProductDetail'));
 export const Page404 = lazy(() => import('src/pages/Page-Not-Found/PageNotFound'));
 
@@ -41,6 +42,7 @@ export default function Router() {
           element: (<Outlet />),
           children: [
             { element: <ProductPage />, index: true },
+            { path: "create", element: <ProductCreatePage /> },
             { path: "detail", element: <ProductDetailPage /> }
           ]
         },

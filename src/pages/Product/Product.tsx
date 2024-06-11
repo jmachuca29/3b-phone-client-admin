@@ -1,4 +1,4 @@
-import { Container, Stack, TableHead } from "@mui/material";
+import { Button, Container, Stack, TableHead, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { Box } from "@mui/material";
 import Table from "@mui/material/Table";
@@ -19,6 +19,7 @@ import { useQuery } from "@tanstack/react-query";
 import InfoIcon from "@mui/icons-material/Info";
 import { useNavigate } from "react-router-dom";
 import { getProducts } from "src/services/product";
+import { OrderDetailActions, OrderDetailBody, OrderDetailContainer, OrderDetailDescription, OrderDetailStack } from "./styles";
 
 interface TablePaginationActionsProps {
   count: number;
@@ -149,7 +150,18 @@ const ProductPage = () => {
 
   return (
     <Container maxWidth="lg">
-      <div>My Products</div>
+      <OrderDetailContainer>
+        <OrderDetailStack>
+          <OrderDetailBody>
+            <OrderDetailDescription>
+              <Typography variant="h4">Mis Productos</Typography>
+            </OrderDetailDescription>
+          </OrderDetailBody>
+        </OrderDetailStack>
+        <OrderDetailActions>
+          <Button variant="contained" onClick={() => navigate('create')}>Nuevo Producto</Button>
+        </OrderDetailActions>
+      </OrderDetailContainer>
       <Stack>
         <TableContainer component={Paper}>
           <Table sx={{ minWidth: 500 }} aria-label="custom pagination table">
@@ -164,9 +176,9 @@ const ProductPage = () => {
             <TableBody>
               {(rowsPerPage > 0
                 ? rows.slice(
-                    page * rowsPerPage,
-                    page * rowsPerPage + rowsPerPage
-                  )
+                  page * rowsPerPage,
+                  page * rowsPerPage + rowsPerPage
+                )
                 : rows
               ).map((row: any) => (
                 <TableRow key={row._id}>
