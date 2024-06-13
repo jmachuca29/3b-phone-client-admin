@@ -227,7 +227,7 @@ const ImageUploadContainer = styled(Stack)`
   gap: 12px;
 `
 
-const ImageUploadSection = styled(Box)`
+const ImageUploadSection = styled(Box)<any>`
   padding: 40px;
   outline: none;
   border-radius: 8px;
@@ -237,6 +237,7 @@ const ImageUploadSection = styled(Box)`
   background-color: rgba(145, 158, 171, 0.08);
   border: 1px dashed rgba(145, 158, 171, 0.2);
   transition: opacity 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms, padding 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+  ${({ isdragactive }) => isdragactive == 'true' ? 'opacity: 0.8' : null }
 `
 
 const ImageUploadSectionChild = styled(Stack)`
@@ -352,6 +353,14 @@ const ImagePreviewElementCloseIcon = styled<any>(IconButton)`
   }
 `
 
+const ImagePreviewElementActions = styled(Stack)`
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+  -webkit-box-pack: end;
+  justify-content: flex-end;
+`
+
 export {
   //ORDER DETAIL
   OrderDetailContainer,
@@ -403,5 +412,6 @@ export {
   ImagePreviewElement,
   ImagePreviewElementSpan,
   ImagePreviewElementBox,
-  ImagePreviewElementCloseIcon
+  ImagePreviewElementCloseIcon,
+  ImagePreviewElementActions
 };
