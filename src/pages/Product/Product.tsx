@@ -1,4 +1,4 @@
-import { Button, Container, Stack, TableHead, Typography } from "@mui/material";
+import { Button, Container, Menu, MenuItem, Stack, TableHead, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { Box } from "@mui/material";
 import Table from "@mui/material/Table";
@@ -20,6 +20,7 @@ import InfoIcon from "@mui/icons-material/Info";
 import { useNavigate } from "react-router-dom";
 import { getProducts } from "src/services/product";
 import { OrderDetailActions, OrderDetailBody, OrderDetailContainer, OrderDetailDescription, OrderDetailStack } from "./styles";
+import Iconify from "src/components/iconify";
 
 interface TablePaginationActionsProps {
   count: number;
@@ -102,11 +103,19 @@ function TablePaginationActions(props: TablePaginationActionsProps) {
 }
 
 const ProductPage = () => {
+  const navigate = useNavigate();
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
-  // const [user] = useAppStore((state) => [state.user]);
   const [rows, setRows] = useState<any>([]);
-  const navigate = useNavigate();
+  const [menuAnchorEls, setMenuAnchorEls] = useState<{ [key: number]: HTMLElement | null }>({});
+
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>, index: number) => {
+    setMenuAnchorEls((prev) => ({ ...prev, [index]: event.currentTarget }));
+  };
+
+  const handleClose = (index: number) => {
+    setMenuAnchorEls((prev) => ({ ...prev, [index]: null }));
+  };
 
   const { isPending, isError, error, data } = useQuery({
     queryKey: ["products"], // Include the token as part of the query key
@@ -180,7 +189,7 @@ const ProductPage = () => {
                   page * rowsPerPage + rowsPerPage
                 )
                 : rows
-              ).map((row: any) => (
+              ).map((row: any, index: number) => (
                 <TableRow key={row._id}>
                   <TableCell component="th" scope="row">
                     {row.description}
@@ -192,12 +201,26 @@ const ProductPage = () => {
                     {row?.color?.description}
                   </TableCell>
                   <TableCell style={{ width: 160 }} align="right">
-                    <IconButton
-                      aria-label="info-icon"
-                      onClick={() => navigate(`/resume/${row.uuid}`)}
-                    >
-                      <InfoIcon />
+                    <IconButton onClick={(event) => handleClick(event, index)}>
+                      <Iconify icon="bi:three-dots-vertical" />
                     </IconButton>
+                    <Menu
+                      anchorEl={menuAnchorEls[index]}
+                      open={Boolean(menuAnchorEls[index])}
+                      onClose={() => handleClose(index)}
+                      MenuListProps={{
+                        'aria-labelledby': 'basic-button',
+                      }}
+                    >
+                      <MenuItem onClick={() => navigate(`detail/${row._id}`)}>
+                        <Iconify style={{ marginRight: 8 }} icon="carbon:view-filled" />
+                        Ver
+                      </MenuItem>
+                      <MenuItem onClick={() => navigate(`edit/${row._id}`)}>
+                        <Iconify style={{ marginRight: 8 }} icon="fluent:edit-24-filled" />
+                        Editar
+                      </MenuItem>
+                    </Menu>
                   </TableCell>
                 </TableRow>
               ))}

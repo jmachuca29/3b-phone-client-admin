@@ -33,7 +33,7 @@ import {
     OrderDetailDescription,
     OrderDetailStack,
 } from "./styles";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
@@ -51,28 +51,23 @@ import IllustrationFile from "src/assets/illustration_file.svg?react";
 import { useDropzone } from "react-dropzone";
 import { useCallback, useEffect, useState } from "react";
 import { getGrade } from "src/services/grade";
-import { ProductCreateDto, ProductCreateProps, ProductWithImageDto } from "src/models/product";
-import { createProduct } from "src/services/product";
+import { ProductCreateDto, ProductCreateProps, ProductUpdateDto, ProductUpdateProps, ProductWithImageUpdateDto } from "src/models/product";
+import { createProduct, getProductbyID, updateProduct } from "src/services/product";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
 dayjs.extend(localizedFormat);
 
-type ProductImage = {
-    name: string
-    url: string
-}
-
 type Inputs = {
+    _id: string
     description: string
     capacity: string
-    image: ProductImage
+    image: any
     prices: any
 };
 
-
-
 const defaultFormValue: Inputs = {
+    _id: "",
     description: "",
     capacity: "",
     image: {
@@ -82,9 +77,11 @@ const defaultFormValue: Inputs = {
     prices: [{ grade: "", price: "" }]
 };
 
-const ProductCreate = () => {
+const ProductUpdate = () => {
+    const { id } = useParams();
     const navigate = useNavigate();
 
+    const [product, setProduct] = useState<any>(null);
     const [files, setFiles] = useState<any>([]);
 
     const onDrop = useCallback((acceptedFiles: File[]) => {
@@ -108,10 +105,6 @@ const ProductCreate = () => {
         }
         setFiles(filesFiltered);
     };
-
-    useEffect(() => {
-        console.log(files)
-    }, [files]);
 
     useEffect(() => {
         // Make sure to revoke the data uris to avoid memory leaks, will run on unmount
@@ -146,12 +139,9 @@ const ProductCreate = () => {
                 }
             );
             const data = await res.json();
-            console.log(data)
             setFiles((prevFiles: any) =>
                 prevFiles.map((f: File) =>
-                    f.name === file.name ? Object.assign(file, {
-                        secure_url: data.secure_url,
-                    }) : f
+                    f.name === file.name ? { ...f, secure_url: data.secure_url } : f
                 )
             );
         };
@@ -162,14 +152,20 @@ const ProductCreate = () => {
     };
 
     const mutationProduct = useMutation({
-        mutationFn: createProduct,
+        mutationFn: ({ id, product }: any) => updateProduct(id, product),
         onSuccess: ($event) => {
-            console.log($event);
-            navigate(-1);
+            console.log($event)
+            navigate(-1)
         },
         onError: (error: any) => {
-            console.log(error);
+            console.log(error)
         },
+    });
+
+    const { data } = useQuery({
+        queryKey: ["saleDetail", id],
+        queryFn: () =>
+            id ? getProductbyID(id) : Promise.reject("No uuid found"),
     });
 
     const { data: capacityData } = useQuery({
@@ -182,7 +178,7 @@ const ProductCreate = () => {
         queryFn: getGrade,
     });
 
-    const { handleSubmit, control, register } = useForm<Inputs>({
+    const { handleSubmit, control, register, setValue } = useForm<Inputs>({
         defaultValues: defaultFormValue,
     });
 
@@ -195,32 +191,64 @@ const ProductCreate = () => {
         name: "prices"
     });
 
+    useEffect(() => {
+        if (data) {
+            const response = data?.data || null;
+            setForm(response);
+            setProduct(response);
+        }
+    }, [data]);
+
+    const setForm = (data: any) => {
+        console.log(data)
+        setValue('_id', data?._id)
+        setValue('capacity', data?.capacity)
+        setValue('description', data?.description)
+        setValue('image', data?.image)
+        setValue('prices', data?.prices)
+        urlToFile(data?.image?.url, data?.image?.name, "image/jpeg").then((file) => {
+            console.log(file);
+            setFiles((prevFiles: any) => [
+                Object.assign(file, {
+                    preview: URL.createObjectURL(file),
+                    secure_url: data?.image?.url
+                })
+            ]);
+        });
+    }
+
+    const urlToFile = async (url: string, filename: string, mimeType: string): Promise<File> => {
+        const response = await fetch(url);
+        const blob = await response.blob();
+        return new File([blob], filename, { type: mimeType });
+    };
+
     const onSubmit: SubmitHandler<Inputs> = (data) => {
         const baseSchema = {
-          description: data.description,
-          capacity: data.capacity,
-          prices: data.prices,
-        };
-      
-        let product;
-      
-        if (files.length === 0) {
-          product = new ProductCreateDto(baseSchema);
-        } else {
-          const productSchemaWithImage = {
-            ...baseSchema,
-            image: {
-              name: files[0]?.name,
-              url: files[0]?.secure_url,
-            },
+            _id: data._id,
+            description: data.description,
+            capacity: data.capacity,
+            prices: data.prices,
           };
-          product = new ProductWithImageDto(productSchemaWithImage);
-        }
-      
-        console.log(product);
-        mutationProduct.mutate(product);
-      };
-      
+        
+          let product;
+        
+          if (files.length === 0) {
+            product = new ProductUpdateDto(baseSchema);
+          } else {
+            const productSchemaWithImage = {
+              ...baseSchema,
+              image: {
+                name: files[0]?.name,
+                url: files[0]?.secure_url,
+              },
+            };
+            product = new ProductWithImageUpdateDto(productSchemaWithImage);
+          }
+        
+          console.log(product);
+        mutationProduct.mutate({ id: id, product: product });
+    };
 
     return (
         <Container maxWidth="lg">
@@ -429,7 +457,7 @@ const ProductCreate = () => {
                     <Grid xs={4}></Grid>
                     <Grid xs={8} sx={{ textAlign: "end" }}>
                         <Button type="submit" variant="contained" size="large">
-                            Crear
+                            Actualizar
                         </Button>
                     </Grid>
                 </Grid>
@@ -438,4 +466,4 @@ const ProductCreate = () => {
     );
 };
 
-export default ProductCreate;
+export default ProductUpdate;
