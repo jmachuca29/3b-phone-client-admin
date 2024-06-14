@@ -28,7 +28,7 @@ import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
 import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
 import LastPageIcon from "@mui/icons-material/LastPage";
 import React, { useEffect, useState } from "react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { deleteProduct, getProducts } from "src/services/product";
 import {
@@ -122,6 +122,7 @@ function TablePaginationActions(props: TablePaginationActionsProps) {
 
 const ProductPage = () => {
   const navigate = useNavigate();
+  const queryClient = useQueryClient()
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [rows, setRows] = useState<any>([]);
@@ -161,6 +162,7 @@ const ProductPage = () => {
     mutationFn: deleteProduct,
     onSuccess: ($event) => {
       console.log($event);
+      queryClient.invalidateQueries({ queryKey: ['products'] })
     },
     onError: (error: any) => {
       console.log(error);
