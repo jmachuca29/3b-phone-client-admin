@@ -31,7 +31,6 @@ const LoginPage = () => {
 
   const {
     handleSubmit,
-    setValue,
     control,
   } = useForm<Inputs>({
     defaultValues: defaultFormValue,

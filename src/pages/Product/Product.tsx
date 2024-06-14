@@ -143,8 +143,7 @@ const ProductPage = () => {
 
   const confirmDelete = (id: string, index: number) => {
     handleModalClose(index)
-    console.log({ id, index})
-    // mutationDeleteProduct.mutate(id)
+    mutationDeleteProduct.mutate(id)
 };
 
   const handleClick = (

@@ -77,9 +77,6 @@ const defaultFormValue: Inputs = {
 const ProductUpdate = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const [product, setProduct] = useState<any>(null);
     const [files, setFiles] = useState<any>([]);
 
     const onDrop = useCallback((acceptedFiles: File[]) => {
@@ -195,7 +192,6 @@ const ProductUpdate = () => {
         if (data) {
             const response = data?.data || null;
             setForm(response);
-            setProduct(response);
         }
     }, [data]);
 
