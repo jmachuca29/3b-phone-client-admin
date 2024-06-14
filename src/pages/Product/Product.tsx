@@ -1,4 +1,17 @@
-import { Container, Stack, TableHead } from "@mui/material";
+import {
+  Button,
+  Container,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Menu,
+  MenuItem,
+  Stack,
+  TableHead,
+  Typography,
+} from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { Box } from "@mui/material";
 import Table from "@mui/material/Table";
@@ -15,10 +28,17 @@ import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
 import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
 import LastPageIcon from "@mui/icons-material/LastPage";
 import React, { useEffect, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import InfoIcon from "@mui/icons-material/Info";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-import { getProducts } from "src/services/product";
+import { deleteProduct, getProducts } from "src/services/product";
+import {
+  OrderDetailActions,
+  OrderDetailBody,
+  OrderDetailContainer,
+  OrderDetailDescription,
+  OrderDetailStack,
+} from "./styles";
+import Iconify from "src/components/iconify";
 
 interface TablePaginationActionsProps {
   count: number;
@@ -101,11 +121,53 @@ function TablePaginationActions(props: TablePaginationActionsProps) {
 }
 
 const ProductPage = () => {
+  const navigate = useNavigate();
+  const queryClient = useQueryClient()
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
-  // const [user] = useAppStore((state) => [state.user]);
   const [rows, setRows] = useState<any>([]);
-  const navigate = useNavigate();
+  const [menuAnchorEls, setMenuAnchorEls] = useState<{
+    [key: number]: HTMLElement | null;
+  }>({});
+  const [modalEls, setModalEls] = React.useState<any>({});
+
+  const handleModalClose = (index: number) => {
+      setModalEls((prev: any) => ({ ...prev, [index]: null }));
+  };
+
+  const handleModalClickOpen = (
+    index: number
+  ) => {
+    handleClose(index)
+    setModalEls((prev: any) => ({ ...prev, [index]: true }));
+  };
+
+  const confirmDelete = (id: string, index: number) => {
+    handleModalClose(index)
+    mutationDeleteProduct.mutate(id)
+};
+
+  const handleClick = (
+    event: React.MouseEvent<HTMLButtonElement>,
+    index: number
+  ) => {
+    setMenuAnchorEls((prev) => ({ ...prev, [index]: event.currentTarget }));
+  };
+
+  const handleClose = (index: number) => {
+    setMenuAnchorEls((prev) => ({ ...prev, [index]: null }));
+  };
+
+  const mutationDeleteProduct = useMutation({
+    mutationFn: deleteProduct,
+    onSuccess: ($event) => {
+      console.log($event);
+      queryClient.invalidateQueries({ queryKey: ['products'] })
+    },
+    onError: (error: any) => {
+      console.log(error);
+    },
+  });
 
   const { isPending, isError, error, data } = useQuery({
     queryKey: ["products"], // Include the token as part of the query key
@@ -118,8 +180,6 @@ const ProductPage = () => {
       setRows(sales);
     }
   }, [data]);
-
-  console.log(rows);
 
   // Avoid a layout jump when reaching the last page with empty rows.
   const emptyRows =
@@ -149,7 +209,20 @@ const ProductPage = () => {
 
   return (
     <Container maxWidth="lg">
-      <div>My Products</div>
+      <OrderDetailContainer>
+        <OrderDetailStack>
+          <OrderDetailBody>
+            <OrderDetailDescription>
+              <Typography variant="h4">Mis Productos</Typography>
+            </OrderDetailDescription>
+          </OrderDetailBody>
+        </OrderDetailStack>
+        <OrderDetailActions>
+          <Button variant="contained" onClick={() => navigate("create")}>
+            Nuevo Producto
+          </Button>
+        </OrderDetailActions>
+      </OrderDetailContainer>
       <Stack>
         <TableContainer component={Paper}>
           <Table sx={{ minWidth: 500 }} aria-label="custom pagination table">
@@ -157,7 +230,6 @@ const ProductPage = () => {
               <TableRow>
                 <TableCell>Descripcion</TableCell>
                 <TableCell align="right">Capacidad</TableCell>
-                <TableCell align="right">Color</TableCell>
                 <TableCell align="right"></TableCell>
               </TableRow>
             </TableHead>
@@ -168,7 +240,7 @@ const ProductPage = () => {
                     page * rowsPerPage + rowsPerPage
                   )
                 : rows
-              ).map((row: any) => (
+              ).map((row: any, index: number) => (
                 <TableRow key={row._id}>
                   <TableCell component="th" scope="row">
                     {row.description}
@@ -177,15 +249,52 @@ const ProductPage = () => {
                     {row?.capacity?.description}
                   </TableCell>
                   <TableCell style={{ width: 160 }} align="right">
-                    {row?.color?.description}
-                  </TableCell>
-                  <TableCell style={{ width: 160 }} align="right">
-                    <IconButton
-                      aria-label="info-icon"
-                      onClick={() => navigate(`/resume/${row.uuid}`)}
-                    >
-                      <InfoIcon />
+                    <IconButton onClick={(event) => handleClick(event, index)}>
+                      <Iconify icon="bi:three-dots-vertical" />
                     </IconButton>
+                    <Menu
+                      anchorEl={menuAnchorEls[index]}
+                      open={Boolean(menuAnchorEls[index])}
+                      onClose={() => handleClose(index)}
+                      MenuListProps={{
+                        "aria-labelledby": "basic-button",
+                      }}
+                    >
+                      <MenuItem onClick={() => navigate(`edit/${row._id}`)}>
+                        <Iconify
+                          style={{ marginRight: 8 }}
+                          icon="fluent:edit-24-filled"
+                        />
+                        Editar
+                      </MenuItem>
+                      <MenuItem onClick={() => handleModalClickOpen(index)}>
+                        <Iconify
+                          style={{ marginRight: 8 }}
+                          icon="ic:outline-delete"
+                        />
+                        Eliminar
+                      </MenuItem>
+                    </Menu>
+                    <Dialog
+                      open={Boolean(modalEls[index])}
+                      aria-labelledby="alert-dialog-title"
+                      aria-describedby="alert-dialog-description"
+                    >
+                      <DialogTitle id="alert-dialog-title">
+                        {"Desea eliminar este producto?"}
+                      </DialogTitle>
+                      <DialogContent>
+                        <DialogContentText id="alert-dialog-description">
+                          Esta accion no se podra revertir
+                        </DialogContentText>
+                      </DialogContent>
+                      <DialogActions>
+                        <Button onClick={()=> handleModalClose(index)}>Cancelar</Button>
+                        <Button onClick={()=> confirmDelete(row._id, index)} autoFocus>
+                          Aceptar
+                        </Button>
+                      </DialogActions>
+                    </Dialog>
                   </TableCell>
                 </TableRow>
               ))}

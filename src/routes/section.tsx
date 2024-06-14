@@ -9,6 +9,8 @@ export const SalesCreatePage = lazy(() => import('src/pages/Sales/Create/SalesCr
 export const SalesDetailPage = lazy(() => import('src/pages/Sales/Detail/SalesDetail'));
 export const SalesEditPage = lazy(() => import('src/pages/Sales/Edit/SalesEdit'));
 export const ProductPage = lazy(() => import('src/pages/Product/Product'));
+export const ProductCreatePage = lazy(() => import('src/pages/Product/Create/ProductCreate'));
+export const ProductEditPage = lazy(() => import('src/pages/Product/Edit/ProductEdit'));
 export const ProductDetailPage = lazy(() => import('src/pages/Product/Detail/ProductDetail'));
 export const Page404 = lazy(() => import('src/pages/Page-Not-Found/PageNotFound'));
 
@@ -17,6 +19,11 @@ export const Page404 = lazy(() => import('src/pages/Page-Not-Found/PageNotFound'
 export default function Router() {
   const routes = useRoutes([
     {
+      element: <LoginPage />,
+      index: true
+    },
+    {
+      path: "dashboard",
       element: (
         <DashboardLayout>
           <Suspense>
@@ -25,10 +32,12 @@ export default function Router() {
         </DashboardLayout>
       ),
       children: [
-        { element: <IndexPage />, index: true },
+        {
+          path: "",
+          element: <Navigate to="sales" replace />, // Redirect from /dashboard to /dashboard/sales
+        },
         {
           path: "sales",
-          element: (<Outlet />),
           children: [
             { element: <SalesPage />, index: true },
             { path: "create", element: <SalesCreatePage /> },
@@ -41,14 +50,12 @@ export default function Router() {
           element: (<Outlet />),
           children: [
             { element: <ProductPage />, index: true },
-            { path: "detail", element: <ProductDetailPage /> }
+            { path: "create", element: <ProductCreatePage /> },
+            { path: "detail", element: <ProductDetailPage /> },
+            { path: "edit/:id", element: <ProductEditPage /> }
           ]
         },
       ],
-    },
-    {
-      path: "login",
-      element: <LoginPage />,
     },
     {
       path: "404",
