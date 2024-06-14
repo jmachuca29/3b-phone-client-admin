@@ -39,19 +39,16 @@ import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 import localizedFormat from "dayjs/plugin/localizedFormat";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { createSale } from "src/services/sales";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import Grid from "@mui/material/Unstable_Grid2";
 import { Controller, SubmitHandler, useFieldArray, useForm } from "react-hook-form";
 import { getCapacity } from "src/services/capacity";
-import { SaleCreateProps, SalesCreateDto } from "src/models/sales";
 import Iconify from "src/components/iconify";
-import { SaleState } from "src/constant/sales";
 import IllustrationFile from "src/assets/illustration_file.svg?react";
 import { useDropzone } from "react-dropzone";
 import { useCallback, useEffect, useState } from "react";
 import { getGrade } from "src/services/grade";
-import { ProductCreateDto, ProductCreateProps, ProductWithImageDto } from "src/models/product";
+import { ProductCreateDto, ProductWithImageDto } from "src/models/product";
 import { createProduct } from "src/services/product";
 
 dayjs.extend(utc);
@@ -182,7 +179,7 @@ const ProductCreate = () => {
         queryFn: getGrade,
     });
 
-    const { handleSubmit, control, register } = useForm<Inputs>({
+    const { handleSubmit, control } = useForm<Inputs>({
         defaultValues: defaultFormValue,
     });
 

@@ -18,9 +18,14 @@ const updateProduct = (id: string, body: any): Promise<AxiosResponse<any, any>> 
   return axios.put(`${baseUrl}/api/product/${id}`, body);
 };
 
+const deleteProduct = (id: string): Promise<AxiosResponse<any, any>> => {
+  return axios.delete(`${baseUrl}/api/product/${id}`);
+};
+
 export {
     getProducts,
     getProductbyID,
     createProduct,
-    updateProduct
+    updateProduct,
+    deleteProduct
 }

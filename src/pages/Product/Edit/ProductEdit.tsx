@@ -39,20 +39,17 @@ import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 import localizedFormat from "dayjs/plugin/localizedFormat";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { createSale } from "src/services/sales";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import Grid from "@mui/material/Unstable_Grid2";
 import { Controller, SubmitHandler, useFieldArray, useForm } from "react-hook-form";
 import { getCapacity } from "src/services/capacity";
-import { SaleCreateProps, SalesCreateDto } from "src/models/sales";
 import Iconify from "src/components/iconify";
-import { SaleState } from "src/constant/sales";
 import IllustrationFile from "src/assets/illustration_file.svg?react";
 import { useDropzone } from "react-dropzone";
 import { useCallback, useEffect, useState } from "react";
 import { getGrade } from "src/services/grade";
-import { ProductCreateDto, ProductCreateProps, ProductUpdateDto, ProductUpdateProps, ProductWithImageUpdateDto } from "src/models/product";
-import { createProduct, getProductbyID, updateProduct } from "src/services/product";
+import { ProductUpdateDto, ProductWithImageUpdateDto } from "src/models/product";
+import { getProductbyID, updateProduct } from "src/services/product";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -81,13 +78,13 @@ const ProductUpdate = () => {
     const { id } = useParams();
     const navigate = useNavigate();
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [product, setProduct] = useState<any>(null);
     const [files, setFiles] = useState<any>([]);
 
     const onDrop = useCallback((acceptedFiles: File[]) => {
         if (acceptedFiles && acceptedFiles.length > 0) {
-            setFiles((prevFiles: any) => [
-                ...prevFiles,
+            setFiles(() => [
                 ...acceptedFiles.map((file: File) =>
                     Object.assign(file, {
                         preview: URL.createObjectURL(file),
@@ -139,9 +136,12 @@ const ProductUpdate = () => {
                 }
             );
             const data = await res.json();
+            console.log(data);
             setFiles((prevFiles: any) =>
                 prevFiles.map((f: File) =>
-                    f.name === file.name ? { ...f, secure_url: data.secure_url } : f
+                    f.name === file.name ? Object.assign(file, {
+                        secure_url: data?.secure_url,
+                    }) : f
                 )
             );
         };
@@ -178,7 +178,7 @@ const ProductUpdate = () => {
         queryFn: getGrade,
     });
 
-    const { handleSubmit, control, register, setValue } = useForm<Inputs>({
+    const { handleSubmit, control, setValue } = useForm<Inputs>({
         defaultValues: defaultFormValue,
     });
 
@@ -206,12 +206,14 @@ const ProductUpdate = () => {
         setValue('description', data?.description)
         setValue('image', data?.image)
         setValue('prices', data?.prices)
-        urlToFile(data?.image?.url, data?.image?.name, "image/jpeg").then((file) => {
+        const imageUrl = data?.image?.url || 'https://res.cloudinary.com/dwuk1xa8f/image/upload/v1718328345/404_not_found.jpg'
+        const imageName = data?.image?.name || 'not_found.jpg'
+        urlToFile(imageUrl, imageName, "image/jpeg").then((file) => {
             console.log(file);
-            setFiles((prevFiles: any) => [
+            setFiles(() => [
                 Object.assign(file, {
                     preview: URL.createObjectURL(file),
-                    secure_url: data?.image?.url
+                    secure_url: imageUrl
                 })
             ]);
         });
@@ -224,6 +226,7 @@ const ProductUpdate = () => {
     };
 
     const onSubmit: SubmitHandler<Inputs> = (data) => {
+        console.log(data);
         const baseSchema = {
             _id: data._id,
             description: data.description,
@@ -240,7 +243,7 @@ const ProductUpdate = () => {
               ...baseSchema,
               image: {
                 name: files[0]?.name,
-                url: files[0]?.secure_url,
+                url: files[0]?.secure_url || 'https://res.cloudinary.com/dwuk1xa8f/image/upload/v1718328345/404_not_found.jpg',
               },
             };
             product = new ProductWithImageUpdateDto(productSchemaWithImage);
