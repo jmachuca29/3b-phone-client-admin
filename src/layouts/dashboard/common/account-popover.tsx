@@ -10,12 +10,14 @@ import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 
 import { account } from 'src/_mock/account';
+import { useNavigate } from 'react-router-dom';
 
 // ----------------------------------------------------------------------
 
 // ----------------------------------------------------------------------
 
 export default function AccountPopover() {
+  const navigate = useNavigate();
   const [open, setOpen] = useState(null);
 
   const handleOpen = (event: any) => {
@@ -24,6 +26,11 @@ export default function AccountPopover() {
 
   const handleClose = () => {
     setOpen(null);
+  };
+
+  const logout = () => {
+    setOpen(null);
+    navigate('/')
   };
 
   return (
@@ -82,7 +89,7 @@ export default function AccountPopover() {
         <MenuItem
           disableRipple
           disableTouchRipple
-          onClick={handleClose}
+          onClick={logout}
           sx={{ typography: 'body2', color: 'error.main', py: 1.5 }}
         >
           Logout

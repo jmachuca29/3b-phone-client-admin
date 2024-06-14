@@ -19,6 +19,11 @@ export const Page404 = lazy(() => import('src/pages/Page-Not-Found/PageNotFound'
 export default function Router() {
   const routes = useRoutes([
     {
+      element: <LoginPage />,
+      index: true
+    },
+    {
+      path: "dashboard",
       element: (
         <DashboardLayout>
           <Suspense>
@@ -27,10 +32,12 @@ export default function Router() {
         </DashboardLayout>
       ),
       children: [
-        { element: <IndexPage />, index: true },
+        {
+          path: "",
+          element: <Navigate to="sales" replace />, // Redirect from /dashboard to /dashboard/sales
+        },
         {
           path: "sales",
-          element: (<Outlet />),
           children: [
             { element: <SalesPage />, index: true },
             { path: "create", element: <SalesCreatePage /> },
@@ -49,10 +56,6 @@ export default function Router() {
           ]
         },
       ],
-    },
-    {
-      path: "login",
-      element: <LoginPage />,
     },
     {
       path: "404",
