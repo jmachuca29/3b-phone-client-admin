@@ -1,5 +1,5 @@
 import { Box, Button, Checkbox, Container, FormControl, IconButton, InputLabel, ListItemText, Menu, MenuItem, OutlinedInput, Paper, Select, SelectChangeEvent, Stack, TextField, Typography } from '@mui/material'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { OrderDetailActions, OrderDetailBody, OrderDetailContainer, OrderDetailDate, OrderDetailDescription, OrderDetailStack } from './styles'
 import Status from 'src/components/status/status'
 import { useNavigate } from 'react-router-dom'
@@ -19,6 +19,7 @@ import { getAccesories } from 'src/services/accesories'
 import { SaleCreateProps, SalesCreateDto } from 'src/models/sales'
 import Iconify from 'src/components/iconify'
 import { SaleState } from 'src/constant/sales'
+import useUbigeo from 'src/hooks/use-ubigeo'
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -31,6 +32,9 @@ type Inputs = {
     lastName: string,
     email: string,
     phoneNumber: string,
+    department: string,
+    province: string,
+    district: string,
     address: string,
     paymentType: string,
     bankEntity: string,
@@ -51,6 +55,9 @@ const defaultFormValue: Inputs = {
     lastName: '',
     email: '',
     phoneNumber: '',
+    department: '',
+    province: '',
+    district: '',
     address: '',
     paymentType: '',
     bankEntity: '',
@@ -112,12 +119,40 @@ const SalesCreate = () => {
     });
 
     const {
+        isPending,
+        error,
+        departments,
+        provinces,
+        districts,
+        getProvincesByDepartamento,
+        getDistricts,
+    } = useUbigeo();
+
+    const {
         handleSubmit,
         setValue,
         control,
+        watch
     } = useForm<Inputs>({
         defaultValues: defaultFormValue,
     });
+
+    const watchDepartment = watch("department");
+    const watchProvince = watch("province");
+
+    useEffect(() => {
+        if (watchDepartment) {
+            getProvincesByDepartamento(watchDepartment);
+            setValue("province", "");
+            setValue("district", "");
+        }
+    }, [watchDepartment]);
+
+    useEffect(() => {
+        if (watchProvince) {
+            getDistricts(watchDepartment, watchProvince);
+        }
+    }, [watchProvince]);
 
     const updateState = (state: SaleState) => {
         setValue('status', state)
@@ -143,7 +178,9 @@ const SalesCreate = () => {
                 lastName: data?.lastName,
                 email: data?.email,
                 phoneNumber: data?.phoneNumber,
-                ubigeo: '',
+                department: data?.department,
+                province: data?.province,
+                district: data?.district,
                 address: data?.address
             },
             price: Number(data?.price),
@@ -153,6 +190,14 @@ const SalesCreate = () => {
         }
         const sale = new SalesCreateDto(saleSchema)
         mutationSale.mutate(sale)
+    }
+
+    if (isPending) {
+        return <span>Loading...</span>;
+    }
+
+    if (error) {
+        return <span>Error: {error.message}</span>;
     }
 
 
@@ -236,6 +281,66 @@ const SalesCreate = () => {
                     <Grid xs={8}>
                         <Paper>
                             <Stack sx={{ display: 'flex', flexDirection: 'column', gap: '24px', padding: '24px' }}>
+                            <Controller
+                                    name="department"
+                                    control={control}
+                                    render={({ field }) => (
+                                        <FormControl>
+                                            <InputLabel id="department-label">Department</InputLabel>
+                                            <Select
+                                                {...field}
+                                                labelId="department-label"
+                                                onChange={(e) => {
+                                                    field.onChange(e);
+                                                    setValue("province", "");
+                                                    setValue("district", "");
+                                                }}
+                                            >
+                                                {departments.map((d, index) => (
+                                                    <MenuItem key={index} value={d}>{d}</MenuItem>
+                                                ))}
+                                            </Select>
+                                        </FormControl>
+                                    )}
+                                />
+                                <Controller
+                                    name="province"
+                                    control={control}
+                                    render={({ field }) => (
+                                        <FormControl>
+                                            <InputLabel id="province-label">Province</InputLabel>
+                                            <Select
+                                                {...field}
+                                                labelId="province-label"
+                                                onChange={(e) => {
+                                                    field.onChange(e);
+                                                    setValue("district", "");
+                                                }}
+                                            >
+                                                {provinces.map((p, index) => (
+                                                    <MenuItem key={index} value={p}>{p}</MenuItem>
+                                                ))}
+                                            </Select>
+                                        </FormControl>
+                                    )}
+                                />
+                                <Controller
+                                    name="district"
+                                    control={control}
+                                    render={({ field }) => (
+                                        <FormControl>
+                                            <InputLabel id="district-label">District</InputLabel>
+                                            <Select
+                                                {...field}
+                                                labelId="district-label"
+                                            >
+                                                {districts.map((d, index) => (
+                                                    <MenuItem key={index} value={d}>{d}</MenuItem>
+                                                ))}
+                                            </Select>
+                                        </FormControl>
+                                    )}
+                                />
                                 <Controller
                                     name="address"
                                     control={control}

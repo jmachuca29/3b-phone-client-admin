@@ -222,7 +222,6 @@ const ProductUpdate = () => {
     };
 
     const onSubmit: SubmitHandler<Inputs> = (data) => {
-        console.log(data);
         const baseSchema = {
             _id: data._id,
             description: data.description,
@@ -245,7 +244,6 @@ const ProductUpdate = () => {
             product = new ProductWithImageUpdateDto(productSchemaWithImage);
           }
         
-          console.log(product);
         mutationProduct.mutate({ id: id, product: product });
     };
 
