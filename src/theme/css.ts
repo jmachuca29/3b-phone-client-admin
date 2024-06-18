@@ -70,7 +70,6 @@ export function bgBlur(props: any): CSSObject {
   const imgUrl = props?.imgUrl;
 
   if (imgUrl) {
-    console.log('entro al if')
     return {
       position: 'relative',
       backgroundImage: `url(${imgUrl})`,

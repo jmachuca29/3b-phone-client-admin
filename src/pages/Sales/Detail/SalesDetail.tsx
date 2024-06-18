@@ -82,7 +82,7 @@ const SalesDetail = () => {
     const { uuid } = useParams();
     const navigate = useNavigate();
     const queryClient = useQueryClient()
-    const [product, setProduct] = useState<any>(null);
+    const [sale, setSale] = useState<any>(null);
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
 
@@ -101,23 +101,23 @@ const SalesDetail = () => {
 
     const mutationSaleState = useMutation({
         mutationFn: ({ id, state }: any) => updateSaleStatus(id, state),
-        onSuccess:  () => {
-          handleClose()
-          queryClient.invalidateQueries({ queryKey: ['saleDetail'] })
+        onSuccess: () => {
+            handleClose()
+            queryClient.invalidateQueries({ queryKey: ['saleDetail'] })
         },
         onError: (error: any) => {
             console.log(error)
         },
-      });
+    });
 
-    const updateState = (id:string, state: SaleState) => {
+    const updateState = (id: string, state: SaleState) => {
         mutationSaleState.mutate({ id: id, state: state })
     }
 
     useEffect(() => {
         if (data) {
             const response = data?.data || null;
-            setProduct(response);
+            setSale(response);
         }
     }, [data]);
 
@@ -139,10 +139,10 @@ const SalesDetail = () => {
                     <OrderDetailBody>
                         <OrderDetailDescription>
                             <Typography variant="h4">Sales #{uuid}</Typography>
-                            <Status state={product?.status} />
+                            <Status state={sale?.status} />
                         </OrderDetailDescription>
                         <OrderDetailDate variant="body2">
-                            {calculateDate(product?.createdAt)}
+                            {calculateDate(sale?.createdAt)}
                         </OrderDetailDate>
                     </OrderDetailBody>
                 </OrderDetailStack>
@@ -151,9 +151,9 @@ const SalesDetail = () => {
                         variant="outlined"
                         endIcon={<Iconify icon="iconamoon:arrow-down-2" />}
                         onClick={handleClick}>
-                        {product?.status.toLowerCase()}
+                        {sale?.status.toLowerCase()}
                     </Button>
-                    <Button variant="contained" onClick={() => navigate(`../edit/${product?.uuid}`)}>Edit</Button>
+                    <Button variant="contained" onClick={() => navigate(`../edit/${sale?.uuid}`)}>Edit</Button>
                     <Menu
                         id="basic-menu"
                         anchorEl={anchorEl}
@@ -164,7 +164,7 @@ const SalesDetail = () => {
                         }}
                     >
                         {
-                            SaleStateEnum.map((state, index) => <MenuItem key={index} onClick={ ()=> updateState(product?._id, state)}>{state}</MenuItem>)
+                            SaleStateEnum.map((state, index) => <MenuItem key={index} onClick={() => updateState(sale?._id, state)}>{state}</MenuItem>)
                         }
                     </Menu>
                 </OrderDetailActions>
@@ -188,15 +188,15 @@ const SalesDetail = () => {
                                     </ProductDetailDescriptionAvatar>
                                     <ProductDetailDescriptionListItem>
                                         <ListItemText
-                                            primary={product?.productName}
-                                            secondary={product?.capacity?.description}
+                                            primary={sale?.productName}
+                                            secondary={sale?.capacity?.description}
                                         />
                                     </ProductDetailDescriptionListItem>
                                     <ProductDetailDescriptionQuantity>
                                         x1
                                     </ProductDetailDescriptionQuantity>
                                     <ProductDetailDescriptionPrice>
-                                        S/ {product?.price}
+                                        S/ {sale?.price}
                                     </ProductDetailDescriptionPrice>
                                 </ProductDetailDescriptionContainer>
                                 <ProductPriceDetailContainer>
@@ -205,7 +205,7 @@ const SalesDetail = () => {
                                             Sub Total
                                         </ProductPriceDetailDescription>
                                         <ProductPriceDetailPrice>
-                                            S/ {product?.price}
+                                            S/ {sale?.price}
                                         </ProductPriceDetailPrice>
                                     </ProductPriceDetailStack>
                                     <ProductPriceDetailStack>
@@ -219,7 +219,7 @@ const SalesDetail = () => {
                                             Total
                                         </ProductPriceDetailTotalDescription>
                                         <ProductPriceDetailTotalPrice>
-                                            S/ {product?.price}
+                                            S/ {sale?.price}
                                         </ProductPriceDetailTotalPrice>
                                     </ProductPriceDetailTotalStack>
                                 </ProductPriceDetailContainer>
@@ -240,17 +240,17 @@ const SalesDetail = () => {
                         <CustomerInfoContainer>
                             <CustomerInfoAvatarContainer
                                 {...stringAvatar(
-                                    `${product?.user?.name.toUpperCase() +
+                                    `${sale?.user?.name.toUpperCase() +
                                     " " +
-                                    product?.user?.lastName.toUpperCase()
+                                    sale?.user?.lastName.toUpperCase()
                                     }`
                                 )}
                             ></CustomerInfoAvatarContainer>
                             <CustomerInfoDescriptionContainer>
                                 <Typography variant="subtitle2" gutterBottom>
-                                    {product?.user?.name} {product?.user?.lastName}
+                                    {sale?.user?.name} {sale?.user?.lastName}
                                 </Typography>
-                                <Box>{product?.user?.email}</Box>
+                                <Box>{sale?.user?.email}</Box>
                             </CustomerInfoDescriptionContainer>
                         </CustomerInfoContainer>
                         <Divider />
@@ -288,15 +288,33 @@ const SalesDetail = () => {
                         <CustomerShippingContainer>
                             <CustomerShippingSubCategoryContainer>
                                 <CustomerShippingSubCategoryName>
+                                    Department
+                                </CustomerShippingSubCategoryName>
+                                {sale?.user?.department}
+                            </CustomerShippingSubCategoryContainer>
+                            <CustomerShippingSubCategoryContainer>
+                                <CustomerShippingSubCategoryName>
+                                    Province
+                                </CustomerShippingSubCategoryName>
+                                {sale?.user?.province}
+                            </CustomerShippingSubCategoryContainer>
+                            <CustomerShippingSubCategoryContainer>
+                                <CustomerShippingSubCategoryName>
+                                    District
+                                </CustomerShippingSubCategoryName>
+                                {sale?.user?.district}
+                            </CustomerShippingSubCategoryContainer>
+                            <CustomerShippingSubCategoryContainer>
+                                <CustomerShippingSubCategoryName>
                                     Address
                                 </CustomerShippingSubCategoryName>
-                                {product?.user?.address}
+                                {sale?.user?.address}
                             </CustomerShippingSubCategoryContainer>
                             <CustomerShippingSubCategoryContainer>
                                 <CustomerShippingSubCategoryName>
                                     Phone number
                                 </CustomerShippingSubCategoryName>
-                                {product?.user?.phoneNumber}
+                                {sale?.user?.phoneNumber}
                             </CustomerShippingSubCategoryContainer>
                         </CustomerShippingContainer>
                         <Divider />
@@ -313,13 +331,13 @@ const SalesDetail = () => {
                                 <CustomerPaymentSubCategoryName>
                                     Bank
                                 </CustomerPaymentSubCategoryName>
-                                {product?.bankEntity}
+                                {sale?.bankEntity}
                             </CustomerPaymentSubCategoryContainer>
                             <CustomerPaymentSubCategoryContainer>
                                 <CustomerPaymentSubCategoryName>
                                     # Account
                                 </CustomerPaymentSubCategoryName>
-                                {product?.numberAccount}
+                                {sale?.numberAccount}
                             </CustomerPaymentSubCategoryContainer>
                         </CustomerPaymentContainer>
                     </MuiPaper>
