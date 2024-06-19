@@ -26,6 +26,7 @@ import localizedFormat from "dayjs/plugin/localizedFormat";
 import Status from "src/components/status/status";
 import Iconify from "src/components/iconify";
 import { useNavigate } from "react-router-dom";
+import { SalesDto } from "src/models/sales";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -131,7 +132,7 @@ const SalesPage = () => {
   const navigate = useNavigate();
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
-  const [rows, setRows] = useState<any>([]);
+  const [rows, setRows] = useState<SalesDto[]>([]);
   const [menuAnchorEls, setMenuAnchorEls] = useState<{ [key: number]: HTMLElement | null }>({});
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>, index: number) => {
@@ -215,10 +216,10 @@ const SalesPage = () => {
                   page * rowsPerPage + rowsPerPage
                 )
                 : rows
-              ).map((row: any, index: number) => (
+              ).map((row: SalesDto, index: number) => (
                 <TableRow key={row.uuid || faker.string.uuid()}>
                   <TableCell component="th" scope="row">
-                    {row.uuid || 'Not available'}
+                    {row.correlative || '-'}
                   </TableCell>
                   <TableCell style={{ display: 'flex', alignItems: 'center' }} align="left">
                     <Avatar sx={{ marginRight: 2 }} {...stringAvatar(
