@@ -59,6 +59,7 @@ import localizedFormat from "dayjs/plugin/localizedFormat";
 import Iconify from "src/components/iconify";
 import Status from "src/components/status/status";
 import { SaleState } from "src/constant/sales";
+import { SalesDto } from "src/models/sales";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -82,7 +83,7 @@ const SalesDetail = () => {
     const { uuid } = useParams();
     const navigate = useNavigate();
     const queryClient = useQueryClient()
-    const [sale, setSale] = useState<any>(null);
+    const [sale, setSale] = useState<SalesDto | null>(null);
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
 
@@ -110,7 +111,8 @@ const SalesDetail = () => {
         },
     });
 
-    const updateState = (id: string, state: SaleState) => {
+    const updateState = (id?: string, state?: SaleState) => {
+        if(!id) return
         mutationSaleState.mutate({ id: id, state: state })
     }
 
@@ -138,11 +140,11 @@ const SalesDetail = () => {
                     </IconButton>
                     <OrderDetailBody>
                         <OrderDetailDescription>
-                            <Typography variant="h4">Sales #{uuid}</Typography>
-                            <Status state={sale?.status} />
+                            <Typography variant="h4">Sales #{sale?.correlative || 0 }</Typography>
+                            <Status state={sale?.status || SaleState.Pending} />
                         </OrderDetailDescription>
                         <OrderDetailDate variant="body2">
-                            {calculateDate(sale?.createdAt)}
+                            {calculateDate(sale?.createdAt || new Date())}
                         </OrderDetailDate>
                     </OrderDetailBody>
                 </OrderDetailStack>
@@ -153,7 +155,7 @@ const SalesDetail = () => {
                         onClick={handleClick}>
                         {sale?.status.toLowerCase()}
                     </Button>
-                    <Button variant="contained" onClick={() => navigate(`../edit/${sale?.uuid}`)}>Edit</Button>
+                    <Button variant="contained" onClick={() => navigate(`../edit/${sale?.correlative}`)}>Edit</Button>
                     <Menu
                         id="basic-menu"
                         anchorEl={anchorEl}

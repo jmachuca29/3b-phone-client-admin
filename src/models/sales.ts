@@ -45,6 +45,27 @@ export type SaleUpdateProps = {
     status: SaleState
 }
 
+export type SaleProps = {
+    _id: string
+    productId?: string
+    uuid: string
+    productName: string
+    capacity: string
+    accesories: string[]
+    serieNumber: string
+    firstImei: string
+    secondImei: string
+    paymentType: string
+    grade: string
+    user: UserProps
+    price: number
+    bankEntity: string
+    numberAccount: string
+    status: SaleState
+    correlative: number
+    createdAt: Date
+}
+
 export class SalesCreateDto {
     productName: string
     capacity: string
@@ -81,5 +102,21 @@ export class SalesUpdateDto extends SalesCreateDto {
     constructor(sale: SaleUpdateProps) {
         super(sale)
         this.uuid = sale.uuid || ''
+    }
+}
+
+export class SalesDto extends SalesCreateDto {
+    _id: string
+    uuid: string
+    correlative: number
+    createdAt: Date
+    capacity: any
+    constructor(sale: SaleProps) {
+        super(sale)
+        this.correlative = sale.correlative || 0
+        this.uuid = sale.uuid || ''
+        this.createdAt = sale.createdAt
+        this.capacity = sale.capacity || ''
+        this._id = sale._id
     }
 }
