@@ -107,10 +107,6 @@ const ProductCreate = () => {
     };
 
     useEffect(() => {
-        console.log(files)
-    }, [files]);
-
-    useEffect(() => {
         // Make sure to revoke the data uris to avoid memory leaks, will run on unmount
         return () =>
             files.forEach((file: any) => URL.revokeObjectURL(file.preview));
@@ -122,6 +118,7 @@ const ProductCreate = () => {
             'image/png': ['.png'],
             'image/jpg': ['.jpg', '.jpeg'],
         },
+        maxSize: 350000,
         onDrop
     });
 
@@ -279,7 +276,7 @@ const ProductCreate = () => {
                                                         >
                                                             browse
                                                         </ImageUploadSectionInstructionsLink>
-                                                        thorough your machine
+                                                        thorough your machine (Max. 350KB)
                                                     </ImageUploadSectionInstructions>
                                                 </ImageUploadSectionDescription>
                                             </ImageUploadSectionChild>
