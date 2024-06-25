@@ -1,7 +1,7 @@
 // ----------------------------------------------------------------------
 
 export const account: any = {
-  displayName: 'Jaydon Frankie',
-  email: 'demo@gmail.com',
+  displayName: 'Joe Machuca',
+  email: 'jmachucapaulino29@gmail.com',
   photoURL: '/assets/images/avatars/avatar_25.jpg',
 };

@@ -155,7 +155,7 @@ const SalesDetail = () => {
                         onClick={handleClick}>
                         {sale?.status.toLowerCase()}
                     </Button>
-                    <Button variant="contained" onClick={() => navigate(`../edit/${sale?.correlative}`)}>Edit</Button>
+                    <Button variant="contained" onClick={() => navigate(`../edit/${sale?.uuid}`)}>Edit</Button>
                     <Menu
                         id="basic-menu"
                         anchorEl={anchorEl}

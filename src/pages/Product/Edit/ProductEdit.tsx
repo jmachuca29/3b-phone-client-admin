@@ -112,6 +112,7 @@ const ProductUpdate = () => {
             'image/png': ['.png'],
             'image/jpg': ['.jpg', '.jpeg'],
         },
+        maxSize: 350000,
         onDrop
     });
 
@@ -243,7 +244,6 @@ const ProductUpdate = () => {
             };
             product = new ProductWithImageUpdateDto(productSchemaWithImage);
           }
-        
         mutationProduct.mutate({ id: id, product: product });
     };
 
@@ -256,7 +256,7 @@ const ProductUpdate = () => {
                     </IconButton>
                     <OrderDetailBody>
                         <OrderDetailDescription>
-                            <Typography variant="h4">Crear Producto</Typography>
+                            <Typography variant="h4">Editar Producto</Typography>
                         </OrderDetailDescription>
                     </OrderDetailBody>
                 </OrderDetailStack>
@@ -307,7 +307,7 @@ const ProductUpdate = () => {
                                                         >
                                                             browse
                                                         </ImageUploadSectionInstructionsLink>
-                                                        thorough your machine
+                                                        thorough your machine (Max. 350KB)
                                                     </ImageUploadSectionInstructions>
                                                 </ImageUploadSectionDescription>
                                             </ImageUploadSectionChild>

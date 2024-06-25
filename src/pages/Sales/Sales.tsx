@@ -1,4 +1,14 @@
-import { Avatar, Button, Container, ListItemText, Menu, MenuItem, Stack, TableHead, Typography } from "@mui/material";
+import {
+  Avatar,
+  Button,
+  Container,
+  ListItemText,
+  Menu,
+  MenuItem,
+  Stack,
+  TableHead,
+  Typography,
+} from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { Box } from "@mui/material";
 import Table from "@mui/material/Table";
@@ -17,8 +27,14 @@ import LastPageIcon from "@mui/icons-material/LastPage";
 import React, { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getSales } from "src/services/sales";
-import { faker } from '@faker-js/faker';
-import { OrderDetailActions, OrderDetailBody, OrderDetailContainer, OrderDetailDescription, OrderDetailStack } from "./styles";
+import { faker } from "@faker-js/faker";
+import {
+  OrderDetailActions,
+  OrderDetailBody,
+  OrderDetailContainer,
+  OrderDetailDescription,
+  OrderDetailStack,
+} from "./styles";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
@@ -27,6 +43,8 @@ import Status from "src/components/status/status";
 import Iconify from "src/components/iconify";
 import { useNavigate } from "react-router-dom";
 import { SalesDto } from "src/models/sales";
+import ExcelJS from "exceljs";
+import { saveAs } from "file-saver";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -54,7 +72,7 @@ const calculateDate = (date: Date): any => {
   const peruTimeHour = time.tz("America/Lima").format("hh:mm A");
   return {
     peruTimeDay,
-    peruTimeHour
+    peruTimeHour,
   };
 };
 
@@ -128,14 +146,55 @@ function TablePaginationActions(props: TablePaginationActionsProps) {
   );
 }
 
+const generateCSV = async (rows: any) => {
+  const workbook = new ExcelJS.Workbook();
+  const worksheet = workbook.addWorksheet("My CSV Sheet");
+
+  // Add column headers
+  worksheet.columns = [
+    { header: "Orden", key: "correlative", width: 10 },
+    { header: "Nombre del Producto", key: "productName", width: 32 },
+    { header: "Usuario", key: "user", width: 32 },
+    { header: "Fecha", key: "peruTimeDay", width: 32 },
+    { header: "Precio", key: "price", width: 16 },
+    { header: "Status", key: "status", width: 16 },
+  ];
+
+  // Add some rows
+  rows.map((row: any) => {
+    return worksheet.addRow({
+      correlative: row.correlative,
+      productName: row.productName,
+      user: row?.user?.name + ' ' + row?.user?.lastName,
+      peruTimeDay: calculateDate(row?.createdAt).peruTimeDay + ' ' + calculateDate(row?.createdAt).peruTimeHour,
+      price: row?.price,
+      status: row?.status,
+    });
+  });
+
+  // Generate Excel buffer
+  const excelBuffer = await workbook.xlsx.writeBuffer();
+
+  // Save Excel file
+  const blob = new Blob([excelBuffer], {
+    type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  });
+  saveAs(blob, "3bIphone_sales.xlsx");
+};
+
 const SalesPage = () => {
   const navigate = useNavigate();
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [rows, setRows] = useState<SalesDto[]>([]);
-  const [menuAnchorEls, setMenuAnchorEls] = useState<{ [key: number]: HTMLElement | null }>({});
+  const [menuAnchorEls, setMenuAnchorEls] = useState<{
+    [key: number]: HTMLElement | null;
+  }>({});
 
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>, index: number) => {
+  const handleClick = (
+    event: React.MouseEvent<HTMLButtonElement>,
+    index: number
+  ) => {
     setMenuAnchorEls((prev) => ({ ...prev, [index]: event.currentTarget }));
   };
 
@@ -146,7 +205,7 @@ const SalesPage = () => {
   const { isPending, isError, error, data } = useQuery({
     queryKey: ["sales"], // Include the token as part of the query key
     queryFn: getSales,
-    retry: false
+    retry: false,
   });
 
   useEffect(() => {
@@ -189,11 +248,21 @@ const SalesPage = () => {
           <OrderDetailBody>
             <OrderDetailDescription>
               <Typography variant="h4">My Sales</Typography>
+              <Button
+                size="medium"
+                color="primary"
+                onClick={() => generateCSV(rows)}
+                startIcon={<Iconify icon="vscode-icons:file-type-excel" />}
+              >
+                Exportar
+              </Button>
             </OrderDetailDescription>
           </OrderDetailBody>
         </OrderDetailStack>
         <OrderDetailActions>
-          <Button variant="contained" onClick={() => navigate('create')}>Nueva Orden</Button>
+          <Button variant="contained" onClick={() => navigate("create")}>
+            Nueva Orden
+          </Button>
         </OrderDetailActions>
       </OrderDetailContainer>
       <Stack>
@@ -212,32 +281,49 @@ const SalesPage = () => {
             <TableBody>
               {(rowsPerPage > 0
                 ? rows.slice(
-                  page * rowsPerPage,
-                  page * rowsPerPage + rowsPerPage
-                )
+                    page * rowsPerPage,
+                    page * rowsPerPage + rowsPerPage
+                  )
                 : rows
               ).map((row: SalesDto, index: number) => (
                 <TableRow key={row.uuid || faker.string.uuid()}>
                   <TableCell component="th" scope="row">
-                    {row.correlative || '-'}
+                    {row.correlative || "-"}
                   </TableCell>
-                  <TableCell style={{ display: 'flex', alignItems: 'center' }} align="left">
-                    <Avatar sx={{ marginRight: 2 }} {...stringAvatar(
-                      `${row?.user?.name.toUpperCase() +
-                      " " +
-                      row?.user?.lastName.toUpperCase()
-                      }`
-                    )}>
-                    </Avatar>
+                  <TableCell
+                    style={{ display: "flex", alignItems: "center" }}
+                    align="left"
+                  >
+                    <Avatar
+                      sx={{ marginRight: 2 }}
+                      {...stringAvatar(
+                        `${
+                          row?.user?.name.toUpperCase() +
+                          " " +
+                          row?.user?.lastName.toUpperCase()
+                        }`
+                      )}
+                    ></Avatar>
                     <ListItemText
-                      primary={row?.user?.name + ' ' + row?.user?.lastName || 'Usuario Anonimo'}
+                      primary={
+                        row?.user?.name + " " + row?.user?.lastName ||
+                        "Usuario Anonimo"
+                      }
                       secondary={row?.user?.email || null}
                     />
                   </TableCell>
                   <TableCell style={{ width: 160 }} align="left">
                     <ListItemText
-                      primary={row?.createdAt ? calculateDate(row?.createdAt).peruTimeDay : '-'}
-                      secondary={row?.createdAt ? calculateDate(row?.createdAt).peruTimeHour : null}
+                      primary={
+                        row?.createdAt
+                          ? calculateDate(row?.createdAt).peruTimeDay
+                          : "-"
+                      }
+                      secondary={
+                        row?.createdAt
+                          ? calculateDate(row?.createdAt).peruTimeHour
+                          : null
+                      }
                     />
                   </TableCell>
                   <TableCell style={{ width: 160 }} align="left">
@@ -255,15 +341,21 @@ const SalesPage = () => {
                       open={Boolean(menuAnchorEls[index])}
                       onClose={() => handleClose(index)}
                       MenuListProps={{
-                        'aria-labelledby': 'basic-button',
+                        "aria-labelledby": "basic-button",
                       }}
                     >
                       <MenuItem onClick={() => navigate(`detail/${row.uuid}`)}>
-                        <Iconify style={{ marginRight: 8 }} icon="carbon:view-filled" />
+                        <Iconify
+                          style={{ marginRight: 8 }}
+                          icon="carbon:view-filled"
+                        />
                         Ver
                       </MenuItem>
                       <MenuItem onClick={() => navigate(`edit/${row.uuid}`)}>
-                        <Iconify style={{ marginRight: 8 }} icon="fluent:edit-24-filled" />
+                        <Iconify
+                          style={{ marginRight: 8 }}
+                          icon="fluent:edit-24-filled"
+                        />
                         Editar
                       </MenuItem>
                     </Menu>
