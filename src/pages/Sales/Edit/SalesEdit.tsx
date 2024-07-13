@@ -265,7 +265,7 @@ const SalesEdit = () => {
                     </IconButton>
                     <OrderDetailBody>
                         <OrderDetailDescription>
-                            <Typography variant="h4">Orden #{uuid}</Typography>
+                            <Typography variant="h4">Sales #{sale?.correlative || 0 }</Typography>
                             <Status state={sale?.status} />
                         </OrderDetailDescription>
                         <OrderDetailDate variant="body2">

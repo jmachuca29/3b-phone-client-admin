@@ -17,9 +17,6 @@ import { getSalebyUID, updateSaleStatus } from "src/services/sales";
 import Grid from "@mui/material/Unstable_Grid2";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import {
-    CustomerDeliveryContainer,
-    CustomerDeliverySubCategoryContainer,
-    CustomerDeliverySubCategoryName,
     CustomerInfoAvatarContainer,
     CustomerInfoContainer,
     CustomerInfoDescriptionContainer,
@@ -255,29 +252,6 @@ const SalesDetail = () => {
                                 <Box>{sale?.user?.email}</Box>
                             </CustomerInfoDescriptionContainer>
                         </CustomerInfoContainer>
-                        <Divider />
-                        <CardHeader
-                            title="Delivery"
-                            action={
-                                <IconButton aria-label="settings">
-                                    <MoreVertIcon />
-                                </IconButton>
-                            }
-                        />
-                        <CustomerDeliveryContainer>
-                            <CustomerDeliverySubCategoryContainer>
-                                <CustomerDeliverySubCategoryName>
-                                    Ship by
-                                </CustomerDeliverySubCategoryName>
-                                -
-                            </CustomerDeliverySubCategoryContainer>
-                            <CustomerDeliverySubCategoryContainer>
-                                <CustomerDeliverySubCategoryName>
-                                    Tracking No.
-                                </CustomerDeliverySubCategoryName>
-                                -
-                            </CustomerDeliverySubCategoryContainer>
-                        </CustomerDeliveryContainer>
                         <Divider />
                         <CardHeader
                             title="Shipping"
