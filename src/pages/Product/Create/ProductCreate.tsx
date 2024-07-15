@@ -140,7 +140,6 @@ const ProductCreate = () => {
                 }
             );
             const data = await res.json();
-            console.log(data)
             setFiles((prevFiles: any) =>
                 prevFiles.map((f: File) =>
                     f.name === file.name ? Object.assign(file, {
@@ -157,8 +156,7 @@ const ProductCreate = () => {
 
     const mutationProduct = useMutation({
         mutationFn: createProduct,
-        onSuccess: ($event) => {
-            console.log($event);
+        onSuccess: () => {
             navigate(-1);
         },
         onError: (error: any) => {
@@ -211,7 +209,6 @@ const ProductCreate = () => {
           product = new ProductWithImageDto(productSchemaWithImage);
         }
       
-        console.log(product);
         mutationProduct.mutate(product);
       };
       

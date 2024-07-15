@@ -20,8 +20,7 @@ const LoginPage = () => {
 
   const mutationLogin = useMutation({
     mutationFn: signIn,
-    onSuccess: ($event) => {
-      console.log($event);
+    onSuccess: () => {
       navigate('/dashboard')
     },
     onError: (error: any) => {
@@ -37,7 +36,6 @@ const LoginPage = () => {
   });
 
   const onSubmit: SubmitHandler<Inputs> = (data) => {
-    console.log(data)
     mutationLogin.mutate({ username: data.username, password: data.password })
   }
 

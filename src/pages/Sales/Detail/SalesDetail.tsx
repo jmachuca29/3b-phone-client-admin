@@ -76,6 +76,12 @@ const calculateDate = (date: Date): string => {
     return peruTime;
 };
 
+const generateInfoDevice = (capacity: string, originalBox?: boolean): string => {
+    const descriptionCapacity = capacity;
+    const descriptionOriginalBox = originalBox ? 'Incluye caja original' : 'No incluye caja original';
+    return `${descriptionCapacity} - ${descriptionOriginalBox}`;
+}
+
 const SalesDetail = () => {
     const { uuid } = useParams();
     const navigate = useNavigate();
@@ -109,7 +115,7 @@ const SalesDetail = () => {
     });
 
     const updateState = (id?: string, state?: SaleState) => {
-        if(!id) return
+        if (!id) return
         mutationSaleState.mutate({ id: id, state: state })
     }
 
@@ -137,7 +143,7 @@ const SalesDetail = () => {
                     </IconButton>
                     <OrderDetailBody>
                         <OrderDetailDescription>
-                            <Typography variant="h4">Sales #{sale?.correlative || 0 }</Typography>
+                            <Typography variant="h4">Sales #{sale?.correlative || 0}</Typography>
                             <Status state={sale?.status || SaleState.Pending} />
                         </OrderDetailDescription>
                         <OrderDetailDate variant="body2">
@@ -183,12 +189,12 @@ const SalesDetail = () => {
                             <ProductDetailContainer>
                                 <ProductDetailDescriptionContainer>
                                     <ProductDetailDescriptionAvatar variant="rounded">
-                                        <p>Product</p>
+                                        <Iconify icon="ic:baseline-apple" />
                                     </ProductDetailDescriptionAvatar>
                                     <ProductDetailDescriptionListItem>
                                         <ListItemText
                                             primary={sale?.productName}
-                                            secondary={sale?.capacity?.description}
+                                            secondary={generateInfoDevice(sale?.capacity?.description, sale?.originalBox)}
                                         />
                                     </ProductDetailDescriptionListItem>
                                     <ProductDetailDescriptionQuantity>
@@ -229,7 +235,7 @@ const SalesDetail = () => {
                 <Grid xs={4}>
                     <MuiPaper>
                         <CardHeader
-                            title="Customer Info"
+                            title="Datos Usuario"
                             action={
                                 <IconButton aria-label="settings">
                                     <MoreVertIcon />
@@ -252,6 +258,20 @@ const SalesDetail = () => {
                                 <Box>{sale?.user?.email}</Box>
                             </CustomerInfoDescriptionContainer>
                         </CustomerInfoContainer>
+                        <CustomerShippingContainer>
+                            <CustomerShippingSubCategoryContainer>
+                                <CustomerShippingSubCategoryName>
+                                    Tipo Doc.
+                                </CustomerShippingSubCategoryName>
+                                {sale?.documentType?.description || '-' }
+                            </CustomerShippingSubCategoryContainer>
+                            <CustomerShippingSubCategoryContainer>
+                                <CustomerShippingSubCategoryName>
+                                    # Documento
+                                </CustomerShippingSubCategoryName>
+                                {sale?.documentNumber || '-' }
+                            </CustomerShippingSubCategoryContainer>
+                        </CustomerShippingContainer>
                         <Divider />
                         <CardHeader
                             title="Shipping"
