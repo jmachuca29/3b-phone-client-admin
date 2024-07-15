@@ -160,8 +160,7 @@ const ProductPage = () => {
 
   const mutationDeleteProduct = useMutation({
     mutationFn: deleteProduct,
-    onSuccess: ($event) => {
-      console.log($event);
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['products'] })
     },
     onError: (error: any) => {

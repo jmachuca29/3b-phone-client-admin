@@ -142,8 +142,7 @@ const SalesCreate = () => {
 
   const mutationSale = useMutation({
     mutationFn: createSale,
-    onSuccess: ($event) => {
-      console.log($event);
+    onSuccess: () => {
       navigate(-1);
     },
     onError: (error: any) => {
@@ -685,40 +684,6 @@ const SalesCreate = () => {
                       </>
                     )}
                   />
-                  {/* <Controller
-                    name="accesories"
-                    control={control}
-                    render={({ field }) => (
-                      <>
-                        <FormControl>
-                          <InputLabel id="demo-multiple-checkbox-label">
-                            Accesories
-                          </InputLabel>
-                          <Select
-                            label="Accesorios"
-                            multiple
-                            value={field?.value || []}
-                            onChange={(event: SelectChangeEvent<string[]>) => {
-                              field.onChange(event.target.value);
-                            }}
-                            input={<OutlinedInput label="Accesorios" />}
-                            renderValue={(selected: string[]) =>
-                              selected.join(", ")
-                            }
-                          >
-                            {getAccesories()?.map((accesory) => (
-                              <MenuItem key={accesory} value={accesory}>
-                                <Checkbox
-                                  checked={field.value.includes(accesory)}
-                                />
-                                <ListItemText primary={accesory} />
-                              </MenuItem>
-                            ))}
-                          </Select>
-                        </FormControl>
-                      </>
-                    )}
-                  /> */}
                 </Box>
               </Stack>
             </Paper>

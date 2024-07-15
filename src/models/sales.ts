@@ -86,7 +86,7 @@ export class SalesCreateDto {
   bankEntity: string;
   numberAccount: string;
   status: SaleState;
-  documentType: string;
+  documentType: any;
   documentNumber: string;
   constructor(sale: SaleCreateProps) {
     this.productName = sale.productName || "";

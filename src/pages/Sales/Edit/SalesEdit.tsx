@@ -1,4 +1,4 @@
-import { Box, Button, FormControl, IconButton, InputLabel, Menu, MenuItem, Paper, Select, Stack, TextField, Typography, Container, Checkbox, ListItemText } from '@mui/material';
+import { Box, Button, FormControl, IconButton, InputLabel, Menu, MenuItem, Paper, Select, Stack, TextField, Typography, Container, FormLabel, RadioGroup, FormControlLabel, Radio } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { useNavigate, useParams } from 'react-router-dom';
@@ -19,11 +19,24 @@ import Iconify from 'src/components/iconify';
 import { SaleState } from 'src/constant/sales';
 import Status from 'src/components/status/status';
 import { OrderDetailActions, OrderDetailBody, OrderDetailContainer, OrderDetailDate, OrderDetailDescription, OrderDetailStack } from './styles';
-import { getAccesories } from 'src/services/accesories';
+import getDocumentType from 'src/services/type-document';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
 dayjs.extend(localizedFormat);
+
+const documentValidator: any = {
+    DNI: {
+        minLength: 8,
+        maxLength: 8,
+        maxLengthErrorMessage: "Maximo 8 digitos",
+    },
+    PASAPORTE: {
+        minLength: 15,
+        maxLength: 15,
+        maxLengthErrorMessage: "Maximo 15 digitos",
+    },
+};
 
 const SaleStateEnum: SaleState[] = [SaleState.Pending, SaleState.Approved, SaleState.Rejected, SaleState.Reajusted];
 
@@ -46,10 +59,12 @@ type Inputs = {
     secondImei: string;
     capacity: string;
     grade: string;
-    accesories: string[];
+    originalBox: string;
     price: string;
     uuid: string;
     status: SaleState;
+    documentType: string;
+    documentNumber: string;
 };
 
 const defaultFormValue: Inputs = {
@@ -71,10 +86,12 @@ const defaultFormValue: Inputs = {
     secondImei: '',
     capacity: '',
     grade: '',
-    accesories: [],
+    originalBox: '',
     price: '',
     uuid: '',
     status: SaleState.Pending,
+    documentType: '',
+    documentNumber: '',
 };
 
 const calculateDate = (date: Date): string => {
@@ -87,6 +104,7 @@ const SalesEdit = () => {
     const { uuid } = useParams();
     const navigate = useNavigate();
     const [sale, setSale] = useState<any>(null);
+    const [documentTypeName, setDocumentTypeName] = useState("");
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
 
@@ -112,6 +130,11 @@ const SalesEdit = () => {
         queryKey: ["saleDetail", uuid],
         queryFn: () =>
             uuid ? getSalebyUID(uuid) : Promise.reject("No uuid found"),
+    });
+
+    const { data: typeDocumentData } = useQuery({
+        queryKey: ["typeDocument"],
+        queryFn: getDocumentType,
     });
 
     const { data: paymentTypeData } = useQuery({
@@ -144,12 +167,22 @@ const SalesEdit = () => {
         setValue,
         control,
         watch,
+        formState: { errors },
     } = useForm<Inputs>({
         defaultValues: defaultFormValue,
     });
 
     const watchDepartment = watch("department");
     const watchProvince = watch("province");
+    const watchDocumentType = watch("documentType");
+
+    useEffect(() => {
+        const documentTypes = typeDocumentData?.data || [];
+        const documentTypeName =
+            documentTypes.find((doc) => doc._id === watchDocumentType)?.description ||
+            "";
+        setDocumentTypeName(documentTypeName);
+    }, [typeDocumentData, watchDocumentType]);
 
     useEffect(() => {
         if (watchDepartment) {
@@ -202,10 +235,12 @@ const SalesEdit = () => {
         setValue('secondImei', data?.secondImei);
         setValue('capacity', data?.capacity?._id);
         setValue('grade', data?.grade);
-        setValue('accesories', data?.accesories);
+        setValue('originalBox', data?.originalBox.toString());
         setValue('price', data?.price);
         setValue('uuid', data?.uuid);
         setValue('status', data?.status);
+        setValue('documentType', data?.documentType?._id);
+        setValue('documentNumber', data?.documentNumber);
     };
 
     const updateState = (state: SaleState) => {
@@ -218,11 +253,12 @@ const SalesEdit = () => {
     };
 
     const onSubmit: SubmitHandler<Inputs> = (data) => {
+        const hasOriginalBox: boolean = data.originalBox === "true"
         const saleSchema: SaleUpdateProps = {
             productId: data?.productId,
             productName: data?.productName,
             capacity: data?.capacity,
-            accesories: data?.accesories,
+            originalBox: hasOriginalBox,
             serieNumber: data?.serieNumber,
             firstImei: data?.firstImei,
             secondImei: data?.secondImei,
@@ -243,6 +279,8 @@ const SalesEdit = () => {
             bankEntity: data?.bankEntity,
             numberAccount: data?.numberAccount,
             status: data?.status,
+            documentType: data?.documentType,
+            documentNumber: data?.documentNumber,
         };
         const sales = new SalesUpdateDto(saleSchema);
         mutationSale.mutate({ id: sale._id, sale: sales });
@@ -265,7 +303,7 @@ const SalesEdit = () => {
                     </IconButton>
                     <OrderDetailBody>
                         <OrderDetailDescription>
-                            <Typography variant="h4">Sales #{sale?.correlative || 0 }</Typography>
+                            <Typography variant="h4">Sales #{sale?.correlative || 0}</Typography>
                             <Status state={sale?.status} />
                         </OrderDetailDescription>
                         <OrderDetailDate variant="body2">
@@ -314,6 +352,46 @@ const SalesEdit = () => {
                                         name="lastName"
                                         control={control}
                                         render={({ field }) => <TextField label="Apellidos" variant="outlined" {...field} />}
+                                    />
+                                    <Controller
+                                        name="documentType"
+                                        control={control}
+                                        render={({ field }) => (
+                                            <FormControl>
+                                                <InputLabel id="demo-simple-select-label">
+                                                    Tipo Documento
+                                                </InputLabel>
+                                                <Select label="Tipo Documento" {...field}>
+                                                    {typeDocumentData?.data?.map(
+                                                        (type: any, index: number) => (
+                                                            <MenuItem key={index} value={type._id}>
+                                                                {type.description}
+                                                            </MenuItem>
+                                                        )
+                                                    )}
+                                                </Select>
+                                            </FormControl>
+                                        )}
+                                    />
+                                    <Controller
+                                        name="documentNumber"
+                                        control={control}
+                                        rules={{
+                                            maxLength: documentValidator[documentTypeName]?.maxLength,
+                                        }}
+                                        render={({ field }) => (
+                                            <TextField
+                                                label="Numero Documento"
+                                                variant="outlined"
+                                                error={!!errors.documentNumber}
+                                                helperText={
+                                                    errors.documentNumber &&
+                                                    documentValidator[documentTypeName]
+                                                        .maxLengthErrorMessage
+                                                }
+                                                {...field}
+                                            />
+                                        )}
                                     />
                                     <Controller
                                         name="email"
@@ -503,26 +581,38 @@ const SalesEdit = () => {
                                             </FormControl>
                                         )}
                                     />
+                                    <div></div>
                                     <Controller
-                                        name="accesories"
+                                        name="originalBox"
                                         control={control}
                                         render={({ field }) => (
-                                            <FormControl>
-                                                <InputLabel id="accesories-label">Accesories</InputLabel>
-                                                <Select
-                                                    {...field}
-                                                    labelId="accesories-label"
-                                                    multiple
-                                                    renderValue={(selected: string[]) => selected.join(', ')}
-                                                >
-                                                    {getAccesories()?.map((accesory, index) => (
-                                                        <MenuItem key={index} value={accesory}>
-                                                            <Checkbox checked={field.value.includes(accesory)} />
-                                                            <ListItemText primary={accesory} />
-                                                        </MenuItem>
-                                                    ))}
-                                                </Select>
-                                            </FormControl>
+                                            <>
+                                                <FormControl>
+                                                    <FormLabel id="originalBox-group-label">
+                                                        Incluye Caja
+                                                    </FormLabel>
+                                                    <RadioGroup
+                                                        {...field}
+                                                        row
+                                                        aria-labelledby="originalBox-buttons-group-label"
+                                                        name="originalBox-radio-buttons-group"
+                                                        onChange={(event: any) => {
+                                                            field.onChange(event.target.value);
+                                                        }}
+                                                    >
+                                                        <FormControlLabel
+                                                            value="true"
+                                                            control={<Radio />}
+                                                            label="Si"
+                                                        />
+                                                        <FormControlLabel
+                                                            value="false"
+                                                            control={<Radio />}
+                                                            label="No"
+                                                        />
+                                                    </RadioGroup>
+                                                </FormControl>
+                                            </>
                                         )}
                                     />
                                 </Box>

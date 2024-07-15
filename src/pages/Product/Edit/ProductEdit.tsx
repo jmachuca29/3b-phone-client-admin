@@ -134,7 +134,6 @@ const ProductUpdate = () => {
                 }
             );
             const data = await res.json();
-            console.log(data);
             setFiles((prevFiles: any) =>
                 prevFiles.map((f: File) =>
                     f.name === file.name ? Object.assign(file, {
@@ -151,8 +150,7 @@ const ProductUpdate = () => {
 
     const mutationProduct = useMutation({
         mutationFn: ({ id, product }: any) => updateProduct(id, product),
-        onSuccess: ($event) => {
-            console.log($event)
+        onSuccess: () => {
             navigate(-1)
         },
         onError: (error: any) => {
@@ -197,7 +195,6 @@ const ProductUpdate = () => {
     }, [data]);
 
     const setForm = (data: any) => {
-        console.log(data)
         setValue('_id', data?._id)
         setValue('capacity', data?.capacity)
         setValue('description', data?.description)
@@ -206,7 +203,6 @@ const ProductUpdate = () => {
         const imageUrl = data?.image?.url || 'https://res.cloudinary.com/dwuk1xa8f/image/upload/v1718328345/404_not_found.jpg'
         const imageName = data?.image?.name || 'not_found.jpg'
         urlToFile(imageUrl, imageName, "image/jpeg").then((file) => {
-            console.log(file);
             setFiles(() => [
                 Object.assign(file, {
                     preview: URL.createObjectURL(file),
