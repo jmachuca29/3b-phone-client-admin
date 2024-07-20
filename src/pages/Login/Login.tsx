@@ -20,8 +20,12 @@ const LoginPage = () => {
 
   const mutationLogin = useMutation({
     mutationFn: signIn,
-    onSuccess: () => {
-      navigate('/dashboard')
+    onSuccess: async(response) => {
+      const token = response.data.access_token || "";
+      if (token !== "") {
+        localStorage.setItem("3b-iphone-token", token);
+        navigate('/dashboard')
+      }
     },
     onError: (error: any) => {
       console.log(error);
