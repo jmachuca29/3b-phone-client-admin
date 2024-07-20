@@ -32,10 +32,7 @@ export default function Router() {
         </DashboardLayout>
       ),
       children: [
-        {
-          path: "",
-          element: <Navigate to="sales" replace />, // Redirect from /dashboard to /dashboard/sales
-        },
+        { path: "", element: <Navigate to="sales" replace /> },
         {
           path: "sales",
           children: [
