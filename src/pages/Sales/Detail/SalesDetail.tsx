@@ -56,7 +56,6 @@ import localizedFormat from "dayjs/plugin/localizedFormat";
 import Iconify from "src/components/iconify";
 import Status from "src/components/status/status";
 import { SaleState } from "src/constant/sales";
-import { SalesDto } from "src/models/sales";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -76,17 +75,17 @@ const calculateDate = (date: Date): string => {
     return peruTime;
 };
 
-const generateInfoDevice = (capacity: string, originalBox?: boolean): string => {
-    const descriptionCapacity = capacity;
-    const descriptionOriginalBox = originalBox ? 'Incluye caja original' : 'No incluye caja original';
-    return `${descriptionCapacity} - ${descriptionOriginalBox}`;
-}
+const generateInfoDevice = (color:string, originalBox: boolean): string => {
+    const descriptionColor = color;
+    const descriptionOriginalBox = originalBox ? 'Incluye caja' : 'No incluye caja';
+    return `${descriptionColor} - ${descriptionOriginalBox}`;
+  }
 
 const SalesDetail = () => {
     const { uuid } = useParams();
     const navigate = useNavigate();
     const queryClient = useQueryClient()
-    const [sale, setSale] = useState<SalesDto | null>(null);
+    const [sale, setSale] = useState<any>(null);
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
 
@@ -194,7 +193,7 @@ const SalesDetail = () => {
                                     <ProductDetailDescriptionListItem>
                                         <ListItemText
                                             primary={sale?.productName}
-                                            secondary={generateInfoDevice(sale?.capacity?.description, sale?.originalBox)}
+                                            secondary={ generateInfoDevice(sale?.color?.description, sale?.originalBox) }
                                         />
                                     </ProductDetailDescriptionListItem>
                                     <ProductDetailDescriptionQuantity>
