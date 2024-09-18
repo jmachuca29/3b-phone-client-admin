@@ -1,12 +1,17 @@
 /// <reference types="vite-plugin-svgr/client" />
 import {
+    Avatar,
     Box,
     Button,
+    Checkbox,
+    Chip,
     Container,
     FormControl,
     IconButton,
     InputLabel,
+    ListItemText,
     MenuItem,
+    OutlinedInput,
     Paper,
     Select,
     Stack,
@@ -50,6 +55,9 @@ import { useCallback, useEffect, useState } from "react";
 import { getGrade } from "src/services/grade";
 import { ProductUpdateDto, ProductWithImageUpdateDto } from "src/models/product";
 import { getProductbyID, updateProduct } from "src/services/product";
+import { getColor } from "src/services/color";
+import ColorLensIcon from '@mui/icons-material/ColorLens';
+import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -58,7 +66,7 @@ dayjs.extend(localizedFormat);
 type Inputs = {
     _id: string
     description: string
-    capacity: string
+    colors: any[]
     image: any
     prices: any
 };
@@ -66,12 +74,12 @@ type Inputs = {
 const defaultFormValue: Inputs = {
     _id: "",
     description: "",
-    capacity: "",
+    colors: [],
     image: {
         name: '',
         url: ''
     },
-    prices: [{ grade: "", price: "" }]
+    prices: [{ grade: "", price: "", capacity: "", }]
 };
 
 const ProductUpdate = () => {
@@ -105,6 +113,7 @@ const ProductUpdate = () => {
         return () =>
             files.forEach((file: any) => URL.revokeObjectURL(file.preview));
     }, []);
+
 
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
         maxFiles: 1,
@@ -164,6 +173,11 @@ const ProductUpdate = () => {
             id ? getProductbyID(id) : Promise.reject("No uuid found"),
     });
 
+    const { data: colorData } = useQuery({
+        queryKey: ["color"],
+        queryFn: getColor,
+    });
+
     const { data: capacityData } = useQuery({
         queryKey: ["capacity"],
         queryFn: getCapacity,
@@ -194,9 +208,17 @@ const ProductUpdate = () => {
         }
     }, [data]);
 
+    const getColorDescriptions = (colorList: any[]): string[] => {
+        return colorList.map(color => color._id);
+    }
+
+    const getColorsByIds = (ids: string[], colorList: any[]): any[] => {
+        return colorList.filter(color => ids.includes(color._id));
+    }
+
     const setForm = (data: any) => {
         setValue('_id', data?._id)
-        setValue('capacity', data?.capacity)
+        setValue('colors', getColorDescriptions(data?.colors))
         setValue('description', data?.description)
         setValue('image', data?.image)
         setValue('prices', data?.prices)
@@ -219,27 +241,29 @@ const ProductUpdate = () => {
     };
 
     const onSubmit: SubmitHandler<Inputs> = (data) => {
+
         const baseSchema = {
             _id: data._id,
             description: data.description,
-            capacity: data.capacity,
+            colors: getColorsByIds(data.colors, colorData?.data),
             prices: data.prices,
-          };
-        
-          let product;
-        
-          if (files.length === 0) {
+        };
+
+        let product;
+
+        if (files.length === 0) {
             product = new ProductUpdateDto(baseSchema);
-          } else {
+        } else {
             const productSchemaWithImage = {
-              ...baseSchema,
-              image: {
-                name: files[0]?.name,
-                url: files[0]?.secure_url || 'https://res.cloudinary.com/dwuk1xa8f/image/upload/v1718328345/404_not_found.jpg',
-              },
+                ...baseSchema,
+                image: {
+                    name: files[0]?.name,
+                    url: files[0]?.secure_url || 'https://res.cloudinary.com/dwuk1xa8f/image/upload/v1718328345/404_not_found.jpg',
+                },
             };
             product = new ProductWithImageUpdateDto(productSchemaWithImage);
-          }
+        }
+        console.log(product)
         mutationProduct.mutate({ id: id, product: product });
     };
 
@@ -350,8 +374,8 @@ const ProductUpdate = () => {
                         </Paper>
                     </Grid>
                     <Grid xs={4}>
-                        <Typography variant="h6">Capacidad</Typography>
-                        <Typography variant="body2">Seleccione una...</Typography>
+                        <Typography variant="h6">Color</Typography>
+                        <Typography variant="body2">Seleccione los colores...</Typography>
                     </Grid>
                     <Grid xs={8}>
                         <Paper>
@@ -363,24 +387,38 @@ const ProductUpdate = () => {
                                     padding: "24px",
                                 }}
                             >
+
                                 <Controller
-                                    name="capacity"
+                                    name="colors"
                                     control={control}
                                     render={({ field }) => (
                                         <FormControl>
-                                            <InputLabel id="demo-simple-select-label">
-                                                Capacidad
-                                            </InputLabel>
-                                            <Select label="Capacidad" {...field}>
-                                                {capacityData?.data?.map((type: any, index: number) => (
-                                                    <MenuItem key={index} value={type._id}>
-                                                        {type.description}
+                                            <InputLabel id="demo-simple-select-label">Color</InputLabel>
+                                            <Select
+                                                multiple
+                                                labelId="demo-simple-select-label"
+                                                label="Color"
+                                                {...field}
+                                                renderValue={(selectedIds) => (
+                                                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                                        {selectedIds.map((id) => {
+                                                            const color = colorData?.data.find((e: any) => e._id === id);
+                                                            return <Chip key={id} label={color?.description} />
+                                                        })}
+                                                    </Box>
+                                                )}
+                                            >
+                                                {colorData?.data.map((role: any) => (
+                                                    <MenuItem key={role._id} value={role._id}>
+                                                        <Checkbox checked={field.value.includes(role._id)} />
+                                                        <ListItemText primary={role.description} />
                                                     </MenuItem>
                                                 ))}
                                             </Select>
                                         </FormControl>
                                     )}
                                 />
+
                             </Stack>
                         </Paper>
                     </Grid>
@@ -401,7 +439,7 @@ const ProductUpdate = () => {
                                 <>
                                     {fields.map((item, index) => {
                                         return (
-                                            <Box sx={{ display: 'grid', gap: '24px 16px', gridTemplateColumns: '1fr 1fr auto', alignItems: 'center' }} key={item.id}>
+                                            <Box sx={{ display: 'grid', gap: '24px 16px', gridTemplateColumns: '1fr 1fr 1fr auto', alignItems: 'center' }} key={item.id}>
                                                 <Controller
                                                     render={({ field }) =>
                                                         <FormControl>
@@ -418,6 +456,25 @@ const ProductUpdate = () => {
                                                         </FormControl>
                                                     }
                                                     name={`prices.${index}.grade`}
+                                                    control={control}
+                                                />
+                                                <Controller
+
+                                                    render={({ field }) => (
+                                                        <FormControl>
+                                                            <InputLabel id="demo-simple-select-label">
+                                                                Capacidad
+                                                            </InputLabel>
+                                                            <Select label="Capacidad" {...field}>
+                                                                {capacityData?.data?.map((type: any, index: number) => (
+                                                                    <MenuItem key={index} value={type._id}>
+                                                                        {type.description}
+                                                                    </MenuItem>
+                                                                ))}
+                                                            </Select>
+                                                        </FormControl>
+                                                    )}
+                                                    name={`prices.${index}.capacity`}
                                                     control={control}
                                                 />
                                                 <Controller
@@ -439,7 +496,7 @@ const ProductUpdate = () => {
                                         );
                                     })}
                                     <Box sx={{ textAlign: 'center' }}>
-                                        <IconButton onClick={() => append({ grade: "", price: "" })}>
+                                        <IconButton onClick={() => append({ grade: "", price: "", capacity: "" })}>
                                             <Iconify icon="carbon:add-filled" />
                                         </IconButton>
                                     </Box>

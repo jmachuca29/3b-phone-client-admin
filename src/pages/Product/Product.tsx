@@ -228,7 +228,6 @@ const ProductPage = () => {
             <TableHead>
               <TableRow>
                 <TableCell>Descripcion</TableCell>
-                <TableCell align="right">Capacidad</TableCell>
                 <TableCell align="right"></TableCell>
               </TableRow>
             </TableHead>
@@ -243,9 +242,6 @@ const ProductPage = () => {
                 <TableRow key={row._id}>
                   <TableCell component="th" scope="row">
                     {row.description}
-                  </TableCell>
-                  <TableCell style={{ width: 160 }} align="right">
-                    {row?.capacity?.description}
                   </TableCell>
                   <TableCell style={{ width: 160 }} align="right">
                     <IconButton onClick={(event) => handleClick(event, index)}>
