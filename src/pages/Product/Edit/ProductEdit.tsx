@@ -1,6 +1,5 @@
 /// <reference types="vite-plugin-svgr/client" />
 import {
-    Avatar,
     Box,
     Button,
     Checkbox,
@@ -11,7 +10,6 @@ import {
     InputLabel,
     ListItemText,
     MenuItem,
-    OutlinedInput,
     Paper,
     Select,
     Stack,
@@ -56,8 +54,6 @@ import { getGrade } from "src/services/grade";
 import { ProductUpdateDto, ProductWithImageUpdateDto } from "src/models/product";
 import { getProductbyID, updateProduct } from "src/services/product";
 import { getColor } from "src/services/color";
-import ColorLensIcon from '@mui/icons-material/ColorLens';
-import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
