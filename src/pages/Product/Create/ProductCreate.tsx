@@ -2,10 +2,13 @@
 import {
     Box,
     Button,
+    Checkbox,
+    Chip,
     Container,
     FormControl,
     IconButton,
     InputLabel,
+    ListItemText,
     MenuItem,
     Paper,
     Select,
@@ -50,6 +53,7 @@ import { useCallback, useEffect, useState } from "react";
 import { getGrade } from "src/services/grade";
 import { ProductCreateDto, ProductWithImageDto } from "src/models/product";
 import { createProduct } from "src/services/product";
+import { getColor } from "src/services/color";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -62,21 +66,21 @@ type ProductImage = {
 
 type Inputs = {
     description: string
-    capacity: string
     image: ProductImage
-    prices: any
+    prices: any,
+    colors: string[],
 };
 
 
 
 const defaultFormValue: Inputs = {
     description: "",
-    capacity: "",
     image: {
         name: '',
         url: ''
     },
-    prices: [{ grade: "", price: "" }]
+    colors: [],
+    prices: [{ grade: "", price: "", capacity: "" }]
 };
 
 const ProductCreate = () => {
@@ -117,6 +121,7 @@ const ProductCreate = () => {
         accept: {
             'image/png': ['.png'],
             'image/jpg': ['.jpg', '.jpeg'],
+            'image/webp': ['.webp'],
         },
         maxSize: 350000,
         onDrop
@@ -164,6 +169,11 @@ const ProductCreate = () => {
         },
     });
 
+    const { data: colorData } = useQuery({
+        queryKey: ["color"],
+        queryFn: getColor,
+    });
+
     const { data: capacityData } = useQuery({
         queryKey: ["capacity"],
         queryFn: getCapacity,
@@ -187,31 +197,36 @@ const ProductCreate = () => {
         name: "prices"
     });
 
+    const getColorsByIds = (ids: string[], colorList: any[]): any[] => {
+        return colorList.filter(color => ids.includes(color._id));
+    }
+
     const onSubmit: SubmitHandler<Inputs> = (data) => {
+
         const baseSchema = {
-          description: data.description,
-          capacity: data.capacity,
-          prices: data.prices,
+            description: data.description,
+            colors: getColorsByIds(data.colors, colorData?.data),
+            prices: data.prices,
         };
-      
+
         let product;
-      
+
         if (files.length === 0) {
-          product = new ProductCreateDto(baseSchema);
+            product = new ProductCreateDto(baseSchema);
         } else {
-          const productSchemaWithImage = {
-            ...baseSchema,
-            image: {
-              name: files[0]?.name,
-              url: files[0]?.secure_url,
-            },
-          };
-          product = new ProductWithImageDto(productSchemaWithImage);
+            const productSchemaWithImage = {
+                ...baseSchema,
+                image: {
+                    name: files[0]?.name,
+                    url: files[0]?.secure_url,
+                },
+            };
+            product = new ProductWithImageDto(productSchemaWithImage);
         }
-      
+
         mutationProduct.mutate(product);
-      };
-      
+    };
+
 
     return (
         <Container maxWidth="lg">
@@ -320,8 +335,8 @@ const ProductCreate = () => {
                         </Paper>
                     </Grid>
                     <Grid xs={4}>
-                        <Typography variant="h6">Capacidad</Typography>
-                        <Typography variant="body2">Seleccione una...</Typography>
+                        <Typography variant="h6">Color</Typography>
+                        <Typography variant="body2">Seleccione los colores...</Typography>
                     </Grid>
                     <Grid xs={8}>
                         <Paper>
@@ -333,18 +348,31 @@ const ProductCreate = () => {
                                     padding: "24px",
                                 }}
                             >
+
                                 <Controller
-                                    name="capacity"
+                                    name="colors"
                                     control={control}
                                     render={({ field }) => (
                                         <FormControl>
-                                            <InputLabel id="demo-simple-select-label">
-                                                Capacidad
-                                            </InputLabel>
-                                            <Select label="Capacidad" {...field}>
-                                                {capacityData?.data?.map((type: any, index: number) => (
-                                                    <MenuItem key={index} value={type._id}>
-                                                        {type.description}
+                                            <InputLabel id="demo-simple-select-label">Color</InputLabel>
+                                            <Select
+                                                multiple
+                                                labelId="demo-simple-select-label"
+                                                label="Color"
+                                                {...field}
+                                                renderValue={(selectedIds) => (
+                                                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                                        {selectedIds.map((id) => {
+                                                            const color = colorData?.data.find((e: any) => e._id === id);
+                                                            return <Chip key={id} label={color?.description} />
+                                                        })}
+                                                    </Box>
+                                                )}
+                                            >
+                                                {colorData?.data.map((role: any) => (
+                                                    <MenuItem key={role._id} value={role._id}>
+                                                        <Checkbox checked={field.value.includes(role._id)} />
+                                                        <ListItemText primary={role.description} />
                                                     </MenuItem>
                                                 ))}
                                             </Select>
@@ -371,7 +399,7 @@ const ProductCreate = () => {
                                 <>
                                     {fields.map((item, index) => {
                                         return (
-                                            <Box sx={{ display: 'grid', gap: '24px 16px', gridTemplateColumns: '1fr 1fr auto', alignItems: 'center' }} key={item.id}>
+                                            <Box sx={{ display: 'grid', gap: '24px 16px', gridTemplateColumns: '1fr 1fr 1fr auto', alignItems: 'center' }} key={item.id}>
                                                 <Controller
                                                     render={({ field }) =>
                                                         <FormControl>
@@ -388,6 +416,25 @@ const ProductCreate = () => {
                                                         </FormControl>
                                                     }
                                                     name={`prices.${index}.grade`}
+                                                    control={control}
+                                                />
+                                                <Controller
+
+                                                    render={({ field }) => (
+                                                        <FormControl>
+                                                            <InputLabel id="demo-simple-select-label">
+                                                                Capacidad
+                                                            </InputLabel>
+                                                            <Select label="Capacidad" {...field}>
+                                                                {capacityData?.data?.map((type: any, index: number) => (
+                                                                    <MenuItem key={index} value={type._id}>
+                                                                        {type.description}
+                                                                    </MenuItem>
+                                                                ))}
+                                                            </Select>
+                                                        </FormControl>
+                                                    )}
+                                                    name={`prices.${index}.capacity`}
                                                     control={control}
                                                 />
                                                 <Controller
@@ -409,7 +456,7 @@ const ProductCreate = () => {
                                         );
                                     })}
                                     <Box sx={{ textAlign: 'center' }}>
-                                        <IconButton onClick={() => append({ grade: "", price: "" })}>
+                                        <IconButton onClick={() => append({ grade: "", price: "", capacity: "" })}>
                                             <Iconify icon="carbon:add-filled" />
                                         </IconButton>
                                     </Box>
