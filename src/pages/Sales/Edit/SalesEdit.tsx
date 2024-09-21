@@ -234,7 +234,7 @@ const SalesEdit = () => {
         setValue('firstImei', data?.firstImei);
         setValue('secondImei', data?.secondImei);
         setValue('capacity', data?.capacity?._id);
-        setValue('grade', data?.grade);
+        setValue('grade', data?.grade?._id);
         setValue('originalBox', data?.originalBox.toString());
         setValue('price', data?.price);
         setValue('uuid', data?.uuid);
