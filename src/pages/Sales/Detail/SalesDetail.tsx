@@ -75,11 +75,12 @@ const calculateDate = (date: Date): string => {
     return peruTime;
 };
 
-const generateInfoDevice = (color:string, originalBox: boolean): string => {
+const generateInfoDevice = (color: string, grade: string, originalBox: boolean): string => {
     const descriptionColor = color;
+    const descriptionGrade = grade;
     const descriptionOriginalBox = originalBox ? 'Incluye caja' : 'No incluye caja';
-    return `${descriptionColor} - ${descriptionOriginalBox}`;
-  }
+    return `${descriptionColor} -\u00A0Grado ${descriptionGrade} -\u00A0${descriptionOriginalBox}`;
+}
 
 const SalesDetail = () => {
     const { uuid } = useParams();
@@ -192,8 +193,8 @@ const SalesDetail = () => {
                                     </ProductDetailDescriptionAvatar>
                                     <ProductDetailDescriptionListItem>
                                         <ListItemText
-                                            primary={sale?.productName}
-                                            secondary={ generateInfoDevice(sale?.color?.description, sale?.originalBox) }
+                                            primary={sale?.productName + ' - ' + sale?.capacity?.description}
+                                            secondary={generateInfoDevice(sale?.color?.description, sale?.grade?.description, sale?.originalBox)}
                                         />
                                     </ProductDetailDescriptionListItem>
                                     <ProductDetailDescriptionQuantity>
@@ -262,13 +263,13 @@ const SalesDetail = () => {
                                 <CustomerShippingSubCategoryName>
                                     Tipo Doc.
                                 </CustomerShippingSubCategoryName>
-                                {sale?.documentType?.description || '-' }
+                                {sale?.documentType?.description || '-'}
                             </CustomerShippingSubCategoryContainer>
                             <CustomerShippingSubCategoryContainer>
                                 <CustomerShippingSubCategoryName>
                                     # Documento
                                 </CustomerShippingSubCategoryName>
-                                {sale?.documentNumber || '-' }
+                                {sale?.documentNumber || '-'}
                             </CustomerShippingSubCategoryContainer>
                         </CustomerShippingContainer>
                         <Divider />
