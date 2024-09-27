@@ -17,84 +17,85 @@ import { useNavigate } from 'react-router-dom';
 // ----------------------------------------------------------------------
 
 export default function AccountPopover() {
-  const navigate = useNavigate();
-  const [open, setOpen] = useState(null);
+    const navigate = useNavigate();
+    const [open, setOpen] = useState(null);
 
-  const handleOpen = (event: any) => {
-    setOpen(event.currentTarget);
-  };
+    const handleOpen = (event: any) => {
+        setOpen(event.currentTarget);
+    };
 
-  const handleClose = () => {
-    setOpen(null);
-  };
+    const handleClose = () => {
+        setOpen(null);
+    };
 
-  const logout = () => {
-    setOpen(null);
-    navigate('/')
-  };
+    const logout = () => {
+        setOpen(null);
+        localStorage.removeItem("3b-iphone-token");
+        navigate('/')
+    };
 
-  return (
-    <>
-      <IconButton
-        onClick={handleOpen}
-        sx={{
-          width: 40,
-          height: 40,
-          background: (theme) => alpha(theme.palette.grey[500], 0.08),
-          ...(open && {
-            background: (theme: any) =>
-              `linear-gradient(135deg, ${theme.palette.primary.light} 0%, ${theme.palette.primary.main} 100%)`,
-          }) as any,
-        }}
-      >
-        <Avatar
-          src={account.photoURL}
-          alt={account.displayName}
-          sx={{
-            width: 36,
-            height: 36,
-            border: (theme) => `solid 2px ${theme.palette.background.default}`,
-          }}
-        >
-          {account.displayName.charAt(0).toUpperCase()}
-        </Avatar>
-      </IconButton>
+    return (
+        <>
+            <IconButton
+                onClick={handleOpen}
+                sx={{
+                    width: 40,
+                    height: 40,
+                    background: (theme) => alpha(theme.palette.grey[500], 0.08),
+                    ...(open && {
+                        background: (theme: any) =>
+                            `linear-gradient(135deg, ${theme.palette.primary.light} 0%, ${theme.palette.primary.main} 100%)`,
+                    }) as any,
+                }}
+            >
+                <Avatar
+                    src={account.photoURL}
+                    alt={account.displayName}
+                    sx={{
+                        width: 36,
+                        height: 36,
+                        border: (theme) => `solid 2px ${theme.palette.background.default}`,
+                    }}
+                >
+                    {account.displayName.charAt(0).toUpperCase()}
+                </Avatar>
+            </IconButton>
 
-      <Popover
-        open={!!open}
-        anchorEl={open}
-        onClose={handleClose}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-        PaperProps={{
-          sx: {
-            p: 0,
-            mt: 1,
-            ml: 0.75,
-            width: 200,
-          },
-        }}
-      >
-        <Box sx={{ my: 1.5, px: 2 }}>
-          <Typography variant="subtitle2" noWrap>
-            {account.displayName}
-          </Typography>
-          <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
-            {account.email}
-          </Typography>
-        </Box>
+            <Popover
+                open={!!open}
+                anchorEl={open}
+                onClose={handleClose}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+                PaperProps={{
+                    sx: {
+                        p: 0,
+                        mt: 1,
+                        ml: 0.75,
+                        width: 200,
+                    },
+                }}
+            >
+                <Box sx={{ my: 1.5, px: 2 }}>
+                    <Typography variant="subtitle2" noWrap>
+                        {account.displayName}
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
+                        {account.email}
+                    </Typography>
+                </Box>
 
-        <Divider sx={{ borderStyle: 'dashed', m: 0 }} />
+                <Divider sx={{ borderStyle: 'dashed', m: 0 }} />
 
-        <MenuItem
-          disableRipple
-          disableTouchRipple
-          onClick={logout}
-          sx={{ typography: 'body2', color: 'error.main', py: 1.5 }}
-        >
-          Logout
-        </MenuItem>
-      </Popover>
-    </>
-  );
+                <MenuItem
+                    disableRipple
+                    disableTouchRipple
+                    onClick={logout}
+                    sx={{ typography: 'body2', color: 'error.main', py: 1.5 }}
+                >
+                    Logout
+                </MenuItem>
+            </Popover>
+        </>
+    );
 }
